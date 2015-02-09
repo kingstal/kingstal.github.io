@@ -109,15 +109,15 @@ This is [我的github](https://github.com/kingstal) inline link.
     {% endhighlight %}
     
 
-    ```object-c
+    {% highlight object-c %}
     -(void)getName{
         return @"wangminjun";
     }
-    ```
+    {% endhighlight %}
 
 
-    ```python
+    {% highlight python %}
     import this
     print 'something'
-    ```
+    {% endhighlight %}
     
