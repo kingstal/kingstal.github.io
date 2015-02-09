@@ -7,6 +7,8 @@ keywords:
 description:
 ---
 
+2015-02-09 00：05 
+
 从下午忙到现在，终于把博客的平台搞定了，这其中很感谢[suyan](https://github.com/suyan)，整个框架都是他提供的，基本没做改动，
 希望在以后的使用过程中能够有机会对这个模板进行修改。
 
@@ -20,5 +22,4 @@ description:
 
 - google analytics 设置，首先需要注册google analytics 服务，会得到一个'Tracking ID'，然后在配置文件中改为该 ID 即可。 
 
-                                                                                                            
-                                                                                                            2015-02-09 00：05 
+
