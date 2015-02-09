@@ -101,7 +101,23 @@ This is [我的github](https://github.com/kingstal) inline link.
 **粗体**
 
 
+
+    {% highlight ruby %}
+    def foo
+        puts 'foo'
+    end
+    {% endhighlight %}
+    
+
+    ```object-c
     -(void)getName{
         return @"wangminjun";
     }
+    ```
 
+
+    ```python
+    import this
+    print 'something'
+    ```
+    
