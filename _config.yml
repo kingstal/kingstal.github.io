@@ -15,13 +15,13 @@ author:
 
 # 站点信息
 title: 王敏君的博客
-description: 王敏君的博客
+description: 非淡泊无以明志，非宁静无以致远
 url: http://kingstal.github.io/
 rss_url: /pages/atom.xml
 
 # avatar头像及Favicon
-avatar: http://pan.baidu.com/s/1c0F7H8O
-favicon: http://pan.baidu.com/s/1c0F7H8O
+avatar: /assets/image/avatar.png
+favicon: /assets/image/avatar.ico
 
 # google analytics 设置
 ga:
