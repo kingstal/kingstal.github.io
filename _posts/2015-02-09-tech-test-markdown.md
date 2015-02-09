@@ -97,3 +97,11 @@ This is [我的github](https://github.com/kingstal) inline link.
 
 代码`print`
 
+*斜体*
+**粗体**
+
+
+    -(void)getName{
+        return @"wangminjun";
+    }
+
