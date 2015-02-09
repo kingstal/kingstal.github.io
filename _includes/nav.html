@@ -4,7 +4,7 @@
 
     <ul id="tags__ul">
       <li id="pl__all" class="tags__li tags-btn active">所有文章</li>
-      {% for category in site.categories %} 
+      {% for category in site.categories reversed %} 
         <li id="{{ category[0] }}" class="tags__li tags-btn">{{ category[0] }}</li>
       {% endfor %}
     </ul>
