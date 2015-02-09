@@ -109,7 +109,7 @@ This is [我的github](https://github.com/kingstal) inline link.
     {% endhighlight %}
     
 
-    {% highlight object-c %}
+    {% highlight objective-c %}
     -(void)getName{
         return @"wangminjun";
     }
