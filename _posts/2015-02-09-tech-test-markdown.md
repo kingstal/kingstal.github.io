@@ -114,10 +114,31 @@ This is [我的github](https://github.com/kingstal) inline link.
     return @"wangminjun";
     }
     {% endhighlight %}
-
+    
 
     {% highlight python %}
     import this
     print 'something'
     {% endhighlight %}
+    
+测试
+    
+    
+    {% highlight objective-c %}
+    
+    - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+    {
+        if ([segue.identifier isEqualToString:@"TagLocation"]) {
+        UINavigationController *navigationController = segue.destinationViewController;
+        LocationDetailsViewController *controller = (LocationDetailsViewController *)navigationController.topViewController;
+        controller.coordinate = _location.coordinate;
+        controller.placemark = _placemark;
+        controller.managedObjectContext = self.managedObjectContext;
+        }
+    }
+    
+    {% endhighlight %}
+    
+    
+    
     
