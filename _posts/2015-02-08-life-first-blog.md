@@ -24,6 +24,6 @@ description:
 
 - 代码高亮设置，配置文件中`pygments`的设置改为`highlighter: pygments`，在写代码块的时候应在头尾加上
 
-> `{% highlight python %}` 、 `{% endhighlight %}` 。
+> \{% highlight python %\} 、 \{% endhighlight %\} 。
 
 
