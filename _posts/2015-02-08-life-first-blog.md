@@ -22,6 +22,7 @@ description:
 
 - google analytics 设置，首先需要注册google analytics 服务，会得到一个'Tracking ID'，然后在配置文件中改为该 ID 即可。 
 
-- 代码高亮设置，配置文件中`pygments`的设置改为`highlighter: pygments`，在写代码块的时候应在头尾加上`{% highlight python %}`、`{% endhighlight %}`。
+- 代码高亮设置，配置文件中`pygments`的设置改为`highlighter: pygments`，在写代码块的时候应在头尾加上
+`{% highlight python %}`、`{% endhighlight %}`。
 
 
