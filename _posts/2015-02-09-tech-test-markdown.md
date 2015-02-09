@@ -81,9 +81,14 @@ description: 测试Markdown的语法，同时留作以后参考
 一行中用三个以上的星号、减号、底线来建立一个分隔线
 
 
+> 链接
 
 This is [我的github](https://github.com/kingstal) inline link.
+指向本机文件的路径[我的头像](/assets/image/avatar.png)。
 
+插入图片
+
+![我的头像](/assets/image/avatar.png)
 
 
 *斜体*
