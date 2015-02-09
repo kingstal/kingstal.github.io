@@ -62,8 +62,10 @@ description: 测试Markdown的语法，同时留作以后参考
 代码区块很简单，只要简单地缩进 4 个空格或是 1 个制表符就可以
 
     
-    +(NSDictionary *)JSONKeyPathsByPropertyKey {
-      return @{
+    {% highlight objective-c %}
+    
+        +(NSDictionary *)JSONKeyPathsByPropertyKey {
+        return @{
         @"date" : @"dt", //将JSON字典里dt键对应的值，赋值给date属性
         @"locationName" : @"name",
         @"humidity" : @"main.humidity",
@@ -72,6 +74,9 @@ description: 测试Markdown的语法，同时留作以后参考
         @"tempLow" : @"main.temp_min",
       };
     }
+    
+    {% endhighlight %}
+        
   
   
   
@@ -103,21 +108,21 @@ This is [我的github](https://github.com/kingstal) inline link.
 
 
     {% highlight ruby %}
-    def foo
+        def foo
         puts 'foo'
     end
     {% endhighlight %}
     
 
     {% highlight objective-c %}
-    -(void)getName{
+        -(void)getName{
     return @"wangminjun";
     }
     {% endhighlight %}
     
 
     {% highlight python %}
-    import this
+        import this
     print 'something'
     {% endhighlight %}
     
@@ -126,7 +131,7 @@ This is [我的github](https://github.com/kingstal) inline link.
     
     {% highlight objective-c %}
     
-    - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+        - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
     {
         if ([segue.identifier isEqualToString:@"TagLocation"]) {
         UINavigationController *navigationController = segue.destinationViewController;
