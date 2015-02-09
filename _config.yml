@@ -1,0 +1,33 @@
+permalink: /:year/:month/:day/:title.html
+markdown: kramdown
+pygments: true
+
+kramdown:
+  input: GFM
+
+# 作者信息
+author:
+  name: 王敏君
+  email: wangminjun0704@icloud.com
+  link: http://kingstal.github.io/
+  weibo: http://weibo.com/minjun0704
+  github: https://github.com/kingstal
+
+# 站点信息
+title: 王敏君的博客
+description: 王敏君的博客
+url: http://kingstal.github.io/
+rss_url: /pages/atom.xml
+
+# avatar头像及Favicon
+avatar: http://pan.baidu.com/s/1c0F7H8O
+favicon: http://pan.baidu.com/s/1c0F7H8O
+
+# google analytics 设置
+ga:
+  id: UA-54767140-1
+  url: kingstal.github.io/
+
+# disqus 设置
+disqus:
+  shortname: minjun-zh
