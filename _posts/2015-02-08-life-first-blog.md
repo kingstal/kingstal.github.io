@@ -16,6 +16,9 @@ description:
 
 - 使用 Disqus 来为博客添加评论，以前没接触过，原来它是需要注册的，注册之后就会有一个 shortname，然后在配置中在相应位置改为自己的 shortname 就 OK 了。
 
-- 配置 avatar 时，通过在文件目录下上传图片，然后在配置中在相应位置改为 avatar 的文件路径
+- 配置 avatar 时，通过在文件目录下上传图片，然后在配置中在相应位置改为 avatar 的文件路径。
 
-2015-02-09 00：05 
+- google analytics 设置，首先需要注册google analytics 服务，会得到一个'Tracking ID'，然后在配置文件中改为该 ID 即可。 
+
+                                                                                                            
+                                                                                                            2015-02-09 00：05 
