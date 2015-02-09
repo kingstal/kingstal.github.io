@@ -12,8 +12,13 @@ description:
 
 同时，也希望自己以后能过持之以恒的把这个博客写下去。
 
-###搭建过程中遇到的小问题也 mark 一下：
+### 搭建过程中遇到的小问题也 mark 一下：
+
 - 使用 Disqus 来为博客添加评论，以前没接触过，原来它是需要注册的，注册之后就会有一个 shortname，然后在配置中在相应位置改为自己的 shortname 就 OK 了。
 
+  <?php
+    session_start();//开启session
+    echo ‘Session id:’.session_id().‘<br>’;//显示此次交互的session_id
+  ?>
 
 2015-02-09 00：05 
