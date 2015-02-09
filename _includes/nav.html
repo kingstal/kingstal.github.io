@@ -16,31 +16,11 @@
   </nav> <!-- end #tags -->
 
   <div id="posts-list">
-  
-  <!--
-    <form action="" id="search-form">
+      <form action="" id="search-form">
       <a href="/index.html" id="mobile-avatar" style="background-image:url({{ site.avatar }})"></a>
-       NOTE: input field is disabled by default
+      <!-- NOTE: input field is disabled by default-->
       <input id="search-input" type="text" placeholder="Search..." disabled >
     </form>
-  -->
-    
-    <div>
-    <script>
-    (function() {
-      var cx = '013755647892842958159:gknofmzprpg';
-      var gcse = document.createElement('script');
-      gcse.type = 'text/javascript';
-      gcse.async = true;
-      gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
-        '//www.google.com/cse/cse.js?cx=' + cx;
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(gcse, s);
-    })();
-    </script>
-    <gcse:search></gcse:search>
-    </div>
-
 
     <nav id="pl__container">
     {% for post in site.posts %}
