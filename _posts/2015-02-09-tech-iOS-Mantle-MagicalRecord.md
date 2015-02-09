@@ -52,6 +52,29 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
 具体实现：
 
 
+    {% highlight objective-c %}
+    + (NSValueTransformer *)JSONTransformerForKey:(NSString *)key{
+        if ([key isEqualToString:@"createDate"]) {
+            return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
+                //NSString-->NSDate
+                return [self.dateFormatter dateFromString:string];
+            } reverseBlock:^id(NSDate *date) {
+                //NSDate-->NSString
+                return [self.dateFormatter stringFromDate:date];
+            }];
+        }
+        else{
+            return nil;
+        }
+    }
+    + (NSDateFormatter *)dateFormatter {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"yyyy-MM-dd";
+        return dateFormatter;
+    }
+    {% endhighlight %}
+
+
 
 
 ### Core Data 相关
