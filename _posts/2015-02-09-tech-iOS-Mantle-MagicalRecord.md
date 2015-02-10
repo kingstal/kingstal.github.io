@@ -10,7 +10,7 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
 # Mantle
 Mantle 是一个模型框架，支持将 JSON 解析为 Model 对象，也可以反向操作，即将 Model 对象序列化为 JSON。同时，支持 Core  Data 的序列化和反序列化。下面分两个部分介绍
 
-### JSON <--> Model
+### 1. JSON <---> Model
 Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能，那么所创建的模型必须是这个类的子类。为了实现这两者的转换，还必须遵守`<MTLJSONSerializing>`协议，该协议常用的有以下两个方法：
 
 > 1. `+ (NSDictionary *)JSONKeyPathsByPropertyKey;`
@@ -78,6 +78,7 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
     {% endhighlight %}
 
 > `+ (instancetype)reversibleTransformerWithForwardBlock:(MTLValueTransformerBlock)forwardBlock reverseBlock:(MTLValueTransformerBlock)reverseBlock;`
+
 第一个Block的返回的值是 `JSON`-->`model`转换的结果，第二Block的返回值是``model-->`JSON`转换的结果。当然只需要序列化，那么就实现单向转换即可，使用下列API：
 
 > `+ (instancetype)reversibleTransformerWithBlock:(MTLValueTransformerBlock)transformationBlock;`
@@ -110,6 +111,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
 > 空对象处理
+
 有时候 JSON 传过来的对象值为空，这时需要对空对象进行处理。假定`@"isVip" : NSNull.null`
 
 
@@ -126,10 +128,10 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 **这时，就可以调用`MTLJSONAdapter`的类方法实现 JSON <--> model 的互相转换。**
 
-> `+ (id)modelOfClass:(Class)modelClass fromJSONDictionary:(NSDictionary *)JSONDictionary error:(NSError **)error;`
-> `+ (NSArray *)modelsOfClass:(Class)modelClass fromJSONArray:(NSArray *)JSONArray error:(NSError **)error;`
-> `+ (NSDictionary *)JSONDictionaryFromModel:(MTLModel<MTLJSONSerializing> *)model;`
-> `+ (NSArray *)JSONArrayFromModels:(NSArray *)models;`
+> 1. `+ (id)modelOfClass:(Class)modelClass fromJSONDictionary:(NSDictionary *)JSONDictionary error:(NSError **)error;`
+> 2. `+ (NSArray *)modelsOfClass:(Class)modelClass fromJSONArray:(NSArray *)JSONArray error:(NSError **)error;`
+> 3. `+ (NSDictionary *)JSONDictionaryFromModel:(MTLModel<MTLJSONSerializing> *)model;`
+> 4. `+ (NSArray *)JSONArrayFromModels:(NSArray *)models;`
 
 具体参看如下：
 
@@ -148,7 +150,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
     NSDictionary *dictionary = [MTLJSONAdapter JSONDictionaryFromModel:member];
     {% endhighlight %}
 
-### Core Data 相关
+### 2. Core Data 相关
 Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing>`，常见的方法有以下几个：
 
 > 1. `+ (NSString *)managedObjectEntityName;`  
