@@ -82,7 +82,7 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
 
 > `+ (instancetype)reversibleTransformerWithForwardBlock:(MTLValueTransformerBlock)forwardBlock reverseBlock:(MTLValueTransformerBlock)reverseBlock;`
 
-第一个Block的返回的值是 `JSON`-->`model`转换的结果，第二Block的返回值是``model-->`JSON`转换的结果。当然只需要序列化，那么就实现单向转换即可，使用下列API：
+第一个Block的返回的值是 `JSON`-->`model`转换的结果，第二Block的返回值是`model`-->`JSON`转换的结果。当然只需要序列化，那么就实现单向转换即可，使用下列API：
 
 > `+ (instancetype)reversibleTransformerWithBlock:(MTLValueTransformerBlock)transformationBlock;`
 
@@ -175,7 +175,7 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 
 
 
-实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍如何使用MagicalRecord 来进行 Core Data 操作。
+实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](/_posts/2015-02-09-tech-iOS-Mantle-MagicalRecord-2.md)。
 
 
 
