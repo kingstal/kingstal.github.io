@@ -8,10 +8,10 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
 ---
 
 
-### Mantle
+## Mantle
 Mantle 是一个模型框架，支持将 JSON 解析为 Model 对象，也可以反向操作，即将 Model 对象序列化为 JSON。同时，支持 Core  Data 的序列化和反序列化。下面分两个部分介绍
 
-#### 1. JSON <---> Model
+### 1. JSON <---> Model
 Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能，那么所创建的模型必须是这个类的子类。为了实现这两者的转换，还必须遵守`<MTLJSONSerializing>`协议，该协议常用的有以下两个方法：
 
 > > `+ (NSDictionary *)JSONKeyPathsByPropertyKey;`
@@ -158,7 +158,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
     NSDictionary *dictionary = [MTLJSONAdapter JSONDictionaryFromModel:member];
     {% endhighlight %}
 
-#### 2. Core Data 相关
+### 2. Core Data 相关
 Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing>`，常见的方法有以下几个：
 
 > 1. `+ (NSString *)managedObjectEntityName;`  
@@ -175,14 +175,14 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 
 
 
-### MagicalRecord
+## MagicalRecord
 
 
 
 
 
 
-### 参考文献
+## 参考文献
 [http://bawn.github.io/ios/2014/12/11/Mantle.html](http://bawn.github.io/ios/2014/12/11/Mantle.html)
 [http://segmentfault.com/blog/lingchen/1190000002431365](http://segmentfault.com/blog/lingchen/1190000002431365)
 [http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios](http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios)
