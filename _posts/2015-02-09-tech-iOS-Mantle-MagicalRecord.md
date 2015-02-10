@@ -13,15 +13,14 @@ Mantle 是一个模型框架，支持将 JSON 解析为 Model 对象，也可以
 ### 1. JSON <---> Model
 Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能，那么所创建的模型必须是这个类的子类。为了实现这两者的转换，还必须遵守`<MTLJSONSerializing>`协议，该协议常用的有以下两个方法：
 
-> 1. `+ (NSDictionary *)JSONKeyPathsByPropertyKey;`
+> > `+ (NSDictionary *)JSONKeyPathsByPropertyKey;`
 > 该方法是必须实现的，它返回一个字典，用于 Model property 和 JSON key 值之间的匹配。
 
 下面看一个实例。
 
-> Member.h
-
     
     {% highlight objective-c %}
+    // Member.h
     @interface Member : MTLModel<MTLJSONSerializing>
     @property (nonatomic, retain) NSString * memberID;
     @property (nonatomic, retain) NSString * mobilePhone;
@@ -33,10 +32,10 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
     {% endhighlight %}
 
 
-> Member.m
 
 
     {% highlight objective-c %}
+    // Member.m
     //当property 和 json keypath 的名称相同时，可忽略
     + (NSDictionary *)JSONKeyPathsByPropertyKey{
         return @{@"memberID" : @"id",
@@ -48,13 +47,14 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
 
 
 
-> 2. `+ (NSValueTransformer *)JSONTransformerForKey:(NSString *)key;`
+> > `+ (NSValueTransformer *)JSONTransformerForKey:(NSString *)key;`
 > 有时候 model 和 JSON 之间的类型并不相同，该方法可以指定如何来进行转换。
 
 具体实现：
 
 
     {% highlight objective-c %}
+    //属性值转换
     + (NSValueTransformer *)JSONTransformerForKey:(NSString *)key{
         if ([key isEqualToString:@"createDate"]) {
             return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
@@ -87,6 +87,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
     {% highlight objective-c %}
+    // 针对特定的属性进行转换
     + (NSValueTransformer *)createDateJSONTransformer{
         return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
             return [self.dateFormatter dateFromString:string];
@@ -100,10 +101,12 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
     {% highlight objective-c %}
+    // URL 转换的快捷方法
     + (NSValueTransformer *)urlJSONTransformer{
         return [NSValueTransformer valueTransformerForName:MTLURLValueTransformerName];
     }
-
+    
+    // BOOL 类型转换的快捷方法
     + (NSValueTransformer *)isVipJSONTransformer{
         return [NSValueTransformer valueTransformerForName:MTLBooleanValueTransformerName];
     }
@@ -116,6 +119,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
     {% highlight objective-c %}
+    // 这种问题其实只针对于非指针类型，像float，bool，double
     - (void)setNilValueForKey:(NSString *)key{
         if ([key isEqualToString:@"isVip"]) {
             self.isVip = 0;
@@ -126,7 +130,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
     }
     {% endhighlight %}
 
-**这时，就可以调用`MTLJSONAdapter`的类方法实现 JSON <--> model 的互相转换。**
+**这时，就可以调用`MTLJSONAdapter`的类方法实现 JSON <---> model 的互相转换。**
 
 > 1. `+ (id)modelOfClass:(Class)modelClass fromJSONDictionary:(NSDictionary *)JSONDictionary error:(NSError **)error;`
 > 2. `+ (NSArray *)modelsOfClass:(Class)modelClass fromJSONArray:(NSArray *)JSONArray error:(NSError **)error;`
@@ -137,6 +141,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
     {% highlight objective-c %}
+    // 调用MTLJSONAdapter的类方法
     NSDictionary *response = @{@"id" : @"1",
                           @"phone" : @"xxxxxx",
                           @"date" : @"2014-09-09",
