@@ -12,10 +12,12 @@ Mantle 是一个模型框架，支持将 JSON 解析为 Model 对象，也可以
 
 ### JSON <--> Model
 Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能，那么所创建的模型必须是这个类的子类。为了实现这两者的转换，还必须遵守`<MTLJSONSerializing>`协议，该协议常用的有以下两个方法：
+
 > 1. `+ (NSDictionary *)JSONKeyPathsByPropertyKey;`
 > 该方法是必须实现的，它返回一个字典，用于 Model property 和 JSON key 值之间的匹配。
 
 下面看一个实例。
+
 > Member.h
 
     
@@ -67,6 +69,7 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
             return nil;
         }
     }
+    
     + (NSDateFormatter *)dateFormatter {
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"yyyy-MM-dd";
@@ -74,11 +77,80 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
     }
     {% endhighlight %}
 
+> `+ (instancetype)reversibleTransformerWithForwardBlock:(MTLValueTransformerBlock)forwardBlock reverseBlock:(MTLValueTransformerBlock)reverseBlock;`
+第一个Block的返回的值是 `JSON`-->`model`转换的结果，第二Block的返回值是``model-->`JSON`转换的结果。当然只需要序列化，那么就实现单向转换即可，使用下列API：
+
+> `+ (instancetype)reversibleTransformerWithBlock:(MTLValueTransformerBlock)transformationBlock;`
+
+Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
+    {% highlight objective-c %}
+    + (NSValueTransformer *)createDateJSONTransformer{
+        return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
+            return [self.dateFormatter dateFromString:string];
+        } reverseBlock:^id(NSDate *date) {
+             return [self.dateFormatter stringFromDate:date];
+        }];
+    }
+    {% endhighlight %}
+
+方法命名规则是：`+<key>JSONTransformer`，另外对于BOOL和NSURL类型的有更快捷的方法：
+
+
+    {% highlight objective-c %}
+    + (NSValueTransformer *)urlJSONTransformer{
+        return [NSValueTransformer valueTransformerForName:MTLURLValueTransformerName];
+    }
+
+    + (NSValueTransformer *)isVipJSONTransformer{
+        return [NSValueTransformer valueTransformerForName:MTLBooleanValueTransformerName];
+    }
+    {% endhighlight %}
+
+
+> 空对象处理
+有时候 JSON 传过来的对象值为空，这时需要对空对象进行处理。假定`@"isVip" : NSNull.null`
+
+
+    {% highlight objective-c %}
+    - (void)setNilValueForKey:(NSString *)key{
+        if ([key isEqualToString:@"isVip"]) {
+            self.isVip = 0;
+        }
+        else{
+            [super setNilValueForKey:key];
+        }
+    }
+    {% endhighlight %}
+
+**这时，就可以调用`MTLJSONAdapter`的类方法实现 JSON <--> model 的互相转换。**
+
+> `+ (id)modelOfClass:(Class)modelClass fromJSONDictionary:(NSDictionary *)JSONDictionary error:(NSError **)error;`
+> `+ (NSArray *)modelsOfClass:(Class)modelClass fromJSONArray:(NSArray *)JSONArray error:(NSError **)error;`
+> `+ (NSDictionary *)JSONDictionaryFromModel:(MTLModel<MTLJSONSerializing> *)model;`
+> `+ (NSArray *)JSONArrayFromModels:(NSArray *)models;`
+
+具体参看如下：
+
+
+    {% highlight objective-c %}
+    NSDictionary *response = @{@"id" : @"1",
+                          @"phone" : @"xxxxxx",
+                          @"date" : @"2014-09-09",
+                          @"goldNumber" : @2,
+                          @"age" : @"18",
+                          @"url" : @"http://bawn.github.io/",
+                          @"isVip" : NSNull.null
+                          };
+    Member *member = [MTLJSONAdapter modelOfClass:[Member class] fromJSONDictionary:response error:nil];
+    
+    NSDictionary *dictionary = [MTLJSONAdapter JSONDictionaryFromModel:member];
+    {% endhighlight %}
 
 ### Core Data 相关
 Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing>`，常见的方法有以下几个：
+
 > 1. `+ (NSString *)managedObjectEntityName;`  
 > 该方法是必须实现的，`返回此类对应的 Entity 类别`。
 > 
