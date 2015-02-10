@@ -1,7 +1,7 @@
 ---
 layout: post
 title: CodePilot
-category: iOS,CodePilot
+category: 工具
 tags: iOS,CodePilot
 keywords: iOS,CodePilot
 description: 如何在 XCode 6上安装 CodePilot
