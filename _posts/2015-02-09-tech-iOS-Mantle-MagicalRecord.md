@@ -170,19 +170,17 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 > 3. `+ (NSValueTransformer *)entityAttributeTransformerForKey:(NSString *)key;`
 > 类似于 model 和 JSON 之间的转换，该方法用于 model 和 entity 之间的属性值转换。
 
+
 具体实现：
 
 
 
-
-## MagicalRecord
-
+实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍如何使用MagicalRecord 来进行 Core Data 操作。
 
 
 
 
 
-## 参考文献
+## 参考
 [http://bawn.github.io/ios/2014/12/11/Mantle.html](http://bawn.github.io/ios/2014/12/11/Mantle.html)
-[http://segmentfault.com/blog/lingchen/1190000002431365](http://segmentfault.com/blog/lingchen/1190000002431365)
-[http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios](http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios)
+[https://github.com/Mantle/Mantle](https://github.com/Mantle/Mantle)
