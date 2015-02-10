@@ -175,7 +175,7 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 
 
 
-实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](/2015/02/10/tech-iOS-Mantle-MagicalRecord-2.html)。
+实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](http://kingstal.github.io/2015/02/10/tech-iOS-Mantle-MagicalRecord-2.html)。
 
 
 
