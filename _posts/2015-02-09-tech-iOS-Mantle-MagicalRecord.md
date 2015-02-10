@@ -171,3 +171,16 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 具体实现：
 
 
+
+
+# MagicalRecord
+
+
+
+
+
+
+### 参考文献
+[http://bawn.github.io/ios/2014/12/11/Mantle.html](http://bawn.github.io/ios/2014/12/11/Mantle.html)
+[http://segmentfault.com/blog/lingchen/1190000002431365](http://segmentfault.com/blog/lingchen/1190000002431365)
+[http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios](http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios)
