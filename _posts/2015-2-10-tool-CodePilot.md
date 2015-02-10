@@ -7,6 +7,7 @@ keywords:iOS,CodePilot
 description: 如何在 XCode 6上安装 CodePilot
 ---
 
+
 今天在写代码的时候，发现查找 project 中文件的时候不是很方便，就想到使用 Code Pilot。其实以前也打算配置，但那时并没有真正开始
 写代码，所以配置失败也没放在心上，今天终于搞定了，打算把该过程记下来：
 
