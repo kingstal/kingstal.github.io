@@ -1,11 +1,12 @@
 ---
 layout: post
-title: Mantle 和 MagicalRecord 结合，用于操作 Core Data
+title: 双剑合璧：Mantle 与 MagicalRecord 的配合
 category: 技术
 tags: JSON,Mantle,MagicalRecord,Core Data
 keywords: JSON,Mantle,MagicalRecord,Core Data
 description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord 则方便将转换后的 Model 用于 Core Data 操作
 ---
+
 
 # Mantle
 Mantle 是一个模型框架，支持将 JSON 解析为 Model 对象，也可以反向操作，即将 Model 对象序列化为 JSON。同时，支持 Core  Data 的序列化和反序列化。下面分两个部分介绍
