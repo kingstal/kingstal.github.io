@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 双剑合璧：Mantle 与 MagicalRecord 的配合
+title: 双剑合璧：Mantle 与 MagicalRecord 的配合（1）
 category: 技术
 tags: JSON,Mantle,MagicalRecord,Core Data
 keywords: JSON,Mantle,MagicalRecord,Core Data
