@@ -1,18 +1,25 @@
 ---
 layout: post
-title: 双剑合璧：Mantle 与 MagicalRecord 的配合（2）
+title: MagicalRecord
 category: 技术
-tags: JSON,Mantle,MagicalRecord,Core Data
-keywords: JSON,Mantle,MagicalRecord,Core Data
-description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord 则方便将转换后的 Model 用于 Core Data 操作
+tags: JSON,MagicalRecord,Core Data
+keywords: JSON,MagicalRecord,Core Data
+description: MagicalRecord 可简化 Core Data 操作的代码，并支持将 JSON 导入 Core Data
 ---
 
 
-## MagicalRecord
+## [MagicalRecord](https://github.com/magicalpanda/MagicalRecord)
+iOS 开发过程中，经常采用CoreData来进行数据持久化。但在使用CoreData进行存取等操作时，代码量相对较多。而 `MagicalRecord` 正是为方便操作 CoreData 而生。
+
+MagicalRecord 的三个目标：
+
+1. 简化 CoreData 相关代码
+2. 清晰、简单、单行获取数据
+3. 当需要优化请求的时候，仍然允许修改 NSFetchRequest
 
 ### 1. 配置
-在文件中导入：`#import <MagicalRecord/CoreData+MagicalRecord.h>`
-在`- applicationDidFinishLaunching: withOptions:`或`-awakeFromNib`方法中，使用`MagicalRecord`类方法设置：
+使用 CocoaPods 安装后，在文件中导入：`#import <MagicalRecord/CoreData+MagicalRecord.h>`后即可使用。
+第一步：在`- applicationDidFinishLaunching: withOptions:`或`-awakeFromNib`方法中，使用`MagicalRecord`类方法设置：
 
 >'+ (void)setupCoreDataStack;
 + (void)setupAutoMigratingCoreDataStack;
@@ -140,54 +147,42 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
     + (void) saveUsingCurrentThreadContextWithBlockAndWait:(void (^)(NSManagedObjectContext *localContext))block;
     {% endhighlight %}
 
-
-要进行 Core Data 操作，必须有相应的 Entity，接[上一篇的案例]，我们新建如下实体：
-![实体](/Users/Arthur/Dropbox/blog/kingstal.github.io/assets/image/mantlemagicalrecord2-1.png)
+下面看一个实例：
 
 
+        
     {% highlight objective-c %}
-    // MemberManaged.h
-    @interface MemberManaged : NSManagedObject
-    @property(nonatomic, retain) NSString *memberID;
-    @property(nonatomic, retain) NSString *mobilePhone;
-    @property(nonatomic, retain) NSDate *createDate;
-    @property(nonatomic, retain) NSNumber *goldNumber;
-    @property(nonatomic, retain) NSNumber *age;
-    @property(nonatomic, retain) NSNumber *isVip;
-    @property(nonatomic, retain) NSString *url;
+    // 0. setup
+    [MagicalRecord setupCoreDataStackWithStoreNamed:@"Model"];
+    
+    // 1. insert
+    for (int i = 1; i < 5; i++) {
+        Person* p = [Person MR_createEntity];
+        p.name = [NSString stringWithFormat:@"p%d", i];
+        p.age = [NSNumber numberWithInt:i];
+    }
+    
+    // 2. delete
+    Person* pd = [Person MR_findFirst];
+    [pd MR_deleteEntity];
+    
+    // 3. update
+    Person* pu = [Person MR_findFirstByAttribute:@"name" withValue:@"p2"];
+    pu.name = @"p22";
+    
+    // 4. save
+    [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreWithCompletion:^(BOOL success, NSError* error) {
+        if (success) {
+            NSLog(@"***save success!***");
+        }
+        else {
+            NSLog(@"***save failure!***");
+        }
+    }];
     {% endhighlight %}
 
-## Mantle 和 MagicalRecord 的结合
-### 实现`<MTLManagedObjectSerializing>`协议中的相应方法：
 
-> `Member.m`
-
-
-
-    {% highlight objective-c %}
-    //表示Member类对应的实体类是MemberManaged
-    + (NSString *)managedObjectEntityName{
-        return @"MemberManaged";
-    }
-
-    //表示Member类向MemberManaged类转换的字段映射，因为Member类的字段名是相同，所以这里返回nil
-    + (NSDictionary *)managedObjectKeysByPropertyKey{
-        return nil;
-    }
-
-    //表示Member的url向MemberManaged的url字段值转换，由 Model——>Entity
-    + (NSValueTransformer *)entityAttributeTransformerForKey:(NSString *)key{
-        if ([key isEqualToString:@"url"]) {
-            return [MTLValueTransformer reversibleTransformerWithBlock:^id(NSURL *url) {
-                return url.absoluteString;
-            }];
-        }
-        else{
-            return nil;
-        }
-    }
-    {% endhighlight %}
-
+上述主要讲了如何使用`MagicalRecord`来简化 CoreData 操作的代码，下一篇将主要介绍![如何使用`MagicalRecord`向 CoreData 导入 JSON 数据](http://kingstal.github.io/2015/02/11/tech-iOS-MagicalRecord-2.html)。
 
 
 

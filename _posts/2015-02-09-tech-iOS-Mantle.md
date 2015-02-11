@@ -8,7 +8,7 @@ description: Mantle 用于 JSON 和 Model 之间的转换
 ---
 
 
-## Mantle
+## [Mantle](https://github.com/Mantle/Mantle)
 Mantle 是一个Model 层框架，支持将 JSON 解析为 Model 对象，也可以反向操作，即将 Model 对象序列化为 JSON。同时，支持 Core  Data 的序列化和反序列化。下面分两个部分介绍
 
 ### 1. JSON <---> Model
