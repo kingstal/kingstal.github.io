@@ -150,26 +150,26 @@ MagicalRecord 的三个目标：
 下面看一个实例：
 
 
-        
+
     {% highlight objective-c %}
     // 0. setup
     [MagicalRecord setupCoreDataStackWithStoreNamed:@"Model"];
-    
+
     // 1. insert
     for (int i = 1; i < 5; i++) {
         Person* p = [Person MR_createEntity];
         p.name = [NSString stringWithFormat:@"p%d", i];
         p.age = [NSNumber numberWithInt:i];
     }
-    
+
     // 2. delete
     Person* pd = [Person MR_findFirst];
     [pd MR_deleteEntity];
-    
+
     // 3. update
     Person* pu = [Person MR_findFirstByAttribute:@"name" withValue:@"p2"];
     pu.name = @"p22";
-    
+
     // 4. save
     [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreWithCompletion:^(BOOL success, NSError* error) {
         if (success) {
@@ -182,7 +182,7 @@ MagicalRecord 的三个目标：
     {% endhighlight %}
 
 
-上述主要讲了如何使用`MagicalRecord`来简化 CoreData 操作的代码，下一篇将主要介绍![如何使用`MagicalRecord`向 CoreData 导入 JSON 数据](http://kingstal.github.io/2015/02/11/tech-iOS-MagicalRecord-2.html)。
+上述主要讲了如何使用`MagicalRecord`来简化 CoreData 操作的代码，下一篇将主要介绍[如何使用`MagicalRecord`向 CoreData 导入 JSON 数据](http://kingstal.github.io/2015/02/11/tech-iOS-MagicalRecord-2.html)。
 
 
 
