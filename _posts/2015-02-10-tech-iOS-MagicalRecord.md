@@ -80,7 +80,7 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
 
 > `NSPredicate *peopleFilter = [NSPredicate predicateWithFormat:@"Department IN %@", @[dept1, dept2]];`
 > `NSArray *people = [Person MR_findAllWithPredicate:peopleFilter];`
- 
+
 **返回`NSFetchRequest`**：可以自定义`NSFetchRequest`来进行特定查找
 
 
@@ -109,11 +109,11 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
     NSNumber *totalCalories = [CTFoodDiaryEntry MR_aggregateOperation:@"sum:"
                                                       onAttribute:@"calories"
                                                     withPredicate:predicate];
-    
+
     NSNumber *mostCalories  = [CTFoodDiaryEntry MR_aggregateOperation:@"max:"
                                                       onAttribute:@"calories"
                                                     withPredicate:predicate];
-    
+
     NSArray *caloriesByMonth = [CTFoodDiaryEntry MR_aggregateOperation:@"sum:"
                                                        onAttribute:@"calories"
                                                      withPredicate:predicate
@@ -126,19 +126,19 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
 
     {% highlight objective-c %}
     // NSManagedObjectContext+MagicalSaves
-    - (void) MR_saveOnlySelfWithCompletion:(MRSaveCompletionHandler)completion;
-    - (void) MR_saveToPersistentStoreWithCompletion:(MRSaveCompletionHandler)completion;
-    - (void) MR_saveOnlySelfAndWait;
-    - (void) MR_saveToPersistentStoreAndWait;
+    - (void) MR_saveOnlySelfWithCompletion:(MRSaveCompletionHandler)completion; // Asynchronously
+    - (void) MR_saveToPersistentStoreWithCompletion:(MRSaveCompletionHandler)completion; // Asynchronously
+    - (void) MR_saveOnlySelfAndWait; // Synchronously
+    - (void) MR_saveToPersistentStoreAndWait; // Synchronously
     - (void) MR_saveWithOptions:(MRSaveContextOptions)mask completion:(MRSaveCompletionHandler)completion;
-    
+
     // MagicalRecord+Actions
-    + (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block;
-    + (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion;
+    + (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block; // Asynchronously
+    + (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion; // Asynchronously
     + (void) saveWithBlockAndWait:(void(^)(NSManagedObjectContext *localContext))block;
     + (void) saveUsingCurrentThreadContextWithBlock:(void (^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion;
     + (void) saveUsingCurrentThreadContextWithBlockAndWait:(void (^)(NSManagedObjectContext *localContext))block;
-    {% endhighlight %} 
+    {% endhighlight %}
 
 
 要进行 Core Data 操作，必须有相应的 Entity，接[上一篇的案例]，我们新建如下实体：
@@ -169,12 +169,12 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
     + (NSString *)managedObjectEntityName{
         return @"MemberManaged";
     }
-    
+
     //表示Member类向MemberManaged类转换的字段映射，因为Member类的字段名是相同，所以这里返回nil
     + (NSDictionary *)managedObjectKeysByPropertyKey{
         return nil;
     }
-    
+
     //表示Member的url向MemberManaged的url字段值转换，由 Model——>Entity
     + (NSValueTransformer *)entityAttributeTransformerForKey:(NSString *)key{
         if ([key isEqualToString:@"url"]) {
@@ -195,4 +195,3 @@ description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord �
 ## 参考
 [http://segmentfault.com/blog/lingchen/1190000002431365](http://segmentfault.com/blog/lingchen/1190000002431365)
 [http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios](http://www.raywenderlich.com/56879/magicalrecord-tutorial-ios)
-

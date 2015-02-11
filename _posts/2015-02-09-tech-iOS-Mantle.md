@@ -1,26 +1,26 @@
 ---
 layout: post
-title: 双剑合璧：Mantle 与 MagicalRecord 的配合（1）
+title: Mantle
 category: 技术
-tags: JSON,Mantle,MagicalRecord,Core Data
-keywords: JSON,Mantle,MagicalRecord,Core Data
-description: Mantle 用于 JSON 和 Model 之间的转换，而 MagicalRecord 则方便将转换后的 Model 用于 Core Data 操作
+tags: JSON,Mantle
+keywords: JSON,Mantle
+description: Mantle 用于 JSON 和 Model 之间的转换
 ---
 
 
 ## Mantle
-Mantle 是一个模型框架，支持将 JSON 解析为 Model 对象，也可以反向操作，即将 Model 对象序列化为 JSON。同时，支持 Core  Data 的序列化和反序列化。下面分两个部分介绍
+Mantle 是一个Model 层框架，支持将 JSON 解析为 Model 对象，也可以反向操作，即将 Model 对象序列化为 JSON。同时，支持 Core  Data 的序列化和反序列化。下面分两个部分介绍
 
 ### 1. JSON <---> Model
 Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能，那么所创建的模型必须是这个类的子类。为了实现这两者的转换，还必须遵守`<MTLJSONSerializing>`协议，该协议常用的有以下两个方法：
 
 > > `+ (NSDictionary *)JSONKeyPathsByPropertyKey;`
- 
+
 > 该方法是必须实现的，它返回一个字典，用于 Model property 和 JSON key 值之间的匹配。
 
 下面看一个实例。
 
-    
+
     {% highlight objective-c %}
     // Member.h
     @interface Member : MTLModel<MTLJSONSerializing>
@@ -40,7 +40,7 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
     // Member.m
     //当property 和 json keypath 的名称相同时，可忽略
     + (NSDictionary *)JSONKeyPathsByPropertyKey{
-        return @{@"memberID" : @"id",
+        return @{@"memberID" : @"id",//支持 keypath，如“location.latitude”
             @"mobilePhone" : @"phone",
             @"createDate" : @"date"
         };
@@ -72,7 +72,7 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
             return nil;
         }
     }
-    
+
     + (NSDateFormatter *)dateFormatter {
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"yyyy-MM-dd";
@@ -108,7 +108,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
     + (NSValueTransformer *)urlJSONTransformer{
         return [NSValueTransformer valueTransformerForName:MTLURLValueTransformerName];
     }
-    
+
     // BOOL 类型转换的快捷方法
     + (NSValueTransformer *)isVipJSONTransformer{
         return [NSValueTransformer valueTransformerForName:MTLBooleanValueTransformerName];
@@ -154,7 +154,7 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
                           @"isVip" : NSNull.null
                           };
     Member *member = [MTLJSONAdapter modelOfClass:[Member class] fromJSONDictionary:response error:nil];
-    
+
     NSDictionary *dictionary = [MTLJSONAdapter JSONDictionaryFromModel:member];
     {% endhighlight %}
 
@@ -163,16 +163,16 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 
 > 1. `+ (NSString *)managedObjectEntityName;`  
 > 该方法是必须实现的，`返回此类对应的 Entity 类别`。
-> 
+>
 > 2. `+ (NSDictionary *)managedObjectKeysByPropertyKey;`
 > 该方法是必须实现的，返回一个字典，用于匹配 model property 和 entity property 的 key，即 model 和 Entity 属性的映射关系。
-> 
+>
 > 3. `+ (NSValueTransformer *)entityAttributeTransformerForKey:(NSString *)key;`
 > 类似于 model 和 JSON 之间的转换，该方法用于 model 和 entity 之间的属性值转换。
-> 
+>
 > 4. `+ (NSSet *)propertyKeysForManagedObjectUniquing;`
 > 唯一性检查。
-> 
+>
 > 5. `+ (NSDictionary *)relationshipModelClassesByPropertyKey;`
 > 当 Entity 具有`relationship`的属性时，可以用该方法来进行匹配。
 
@@ -185,7 +185,7 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 > 'MTLModel'——>`NSManagedObject`
 
 
-要实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](http://kingstal.github.io/2015/02/10/tech-iOS-Mantle-MagicalRecord-2.html)。
+使用 Mantle 实现 JSON 的持久化，需要进行两次转化：`JSON`--》`MTLModel`--》`NSManagedObject`。这时我们可以借助于另一个开源库 `MagicalRecord`，它可以极大的方便 Core Data 的使用，同时也支持将 JSON 导入 Core Data。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](http://kingstal.github.io/2015/02/10/tech-iOS-MagicalRecord.html)。
 
 
 
@@ -195,3 +195,5 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 [http://bawn.github.io/ios/2014/12/11/Mantle.html](http://bawn.github.io/ios/2014/12/11/Mantle.html)
 
 [https://github.com/Mantle/Mantle](https://github.com/Mantle/Mantle)
+
+[http://robinchao.github.io/blog/2014/11/08/mantle-jian-dan-shi-yong-jiao-cheng/](http://robinchao.github.io/blog/2014/11/08/mantle-jian-dan-shi-yong-jiao-cheng/)
