@@ -165,17 +165,27 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 > 该方法是必须实现的，`返回此类对应的 Entity 类别`。
 > 
 > 2. `+ (NSDictionary *)managedObjectKeysByPropertyKey;`
-> 该方法是必须实现的，返回一个字典，用于匹配 model property 和 entity property 的 key。
+> 该方法是必须实现的，返回一个字典，用于匹配 model property 和 entity property 的 key，即 model 和 Entity 属性的映射关系。
 > 
 > 3. `+ (NSValueTransformer *)entityAttributeTransformerForKey:(NSString *)key;`
 > 类似于 model 和 JSON 之间的转换，该方法用于 model 和 entity 之间的属性值转换。
+> 
+> 4. `+ (NSSet *)propertyKeysForManagedObjectUniquing;`
+> 唯一性检查。
+> 
+> 5. `+ (NSDictionary *)relationshipModelClassesByPropertyKey;`
+> 当 Entity 具有`relationship`的属性时，可以用该方法来进行匹配。
 
 
-具体实现：
+### 3. 调用`MTLManagedObjectAdapter`实现`MTLModel`和`NSManagedObject`的转换
+
+> 1. `+ (id)modelOfClass:(Class)modelClass fromManagedObject:(NSManagedObject *)managedObject error:(NSError **)error;`
+> `NSManagedObject`——>`MTLModel`
+> 2. `+ (id)managedObjectFromModel:(MTLModel<MTLManagedObjectSerializing> *)model insertingIntoContext:(NSManagedObjectContext *)context error:(NSError **)error;`
+> 'MTLModel'——>`NSManagedObject`
 
 
-
-实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](http://kingstal.github.io/2015/02/10/tech-iOS-Mantle-MagicalRecord-2.html)。
+要实现对 model 的 Core Data 操作，可以借助于 MagicalRecord，它可以极大的方便 Core Data 的使用。下一篇将会介绍[如何使用MagicalRecord 来进行 Core Data 操作](http://kingstal.github.io/2015/02/10/tech-iOS-Mantle-MagicalRecord-2.html)。
 
 
 
@@ -183,4 +193,5 @@ Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing
 
 ## 参考
 [http://bawn.github.io/ios/2014/12/11/Mantle.html](http://bawn.github.io/ios/2014/12/11/Mantle.html)
+
 [https://github.com/Mantle/Mantle](https://github.com/Mantle/Mantle)
