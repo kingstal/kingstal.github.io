@@ -34,18 +34,18 @@ description:
 -	AFURLSessionManager
 -	AFHTTPSessionManager
 
-# 序列化
+## 序列化
 
 AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解析响应。可以通过序列化的灵活设计将更多业务逻辑转移到网络层，并更容易定制之前内置的默认行为。
 
-## `<AFURLRequestSerialization>`
+### `<AFURLRequestSerialization>`
 符合这个协议的对象用于处理请求，它将请求参数转换为 query string 或是 entity body 的形式，并设置必要的 header。
 
 -	AFHTTPRequestSerializer
 -	AFJSONRequestSerializer
 -	AFPropertyListRequestSerializer
 
-## `<AFURLResponseSerialization>`
+### `<AFURLResponseSerialization>`
 符合这个协议的对象用于验证、序列化响应及相关数据，转换为有用的形式，比如 JSON 对象、图像、甚至基于 Mantle 的模型对象。
 
 -	AFHTTPResponseSerializer
@@ -56,11 +56,11 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 -	AFImageResponseSerializer
 -	AFCompoundResponseSerializer
 
-# Additional Functionality
+## Additional Functionality
 -	AFSecurityPolicy
 -	AFNetworkReachabilityManager
 
-# UIKit 扩展
+## UIKit 扩展
 
 -	AFNetworkActivityIndicatorManager：在请求操作开始、停止加载时，自动开始、停止状态栏上的网络活动指示图标。
 
@@ -72,7 +72,7 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 
 -	UIProgressView+AFNetworking (新)：自动跟踪某个请求或会话任务的上传/下载进度。 UIWebView+AFNetworking (新): 为加载 URL 请求提供了更强大的API，支持进度回调和内容转换。
 
-# 参考
+## 参考
 
 [https://github.com/AFNetworking/AFNetworking](https://github.com/AFNetworking/AFNetworking)
 
