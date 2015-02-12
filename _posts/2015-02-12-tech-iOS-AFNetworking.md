@@ -73,3 +73,14 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 [http://www.raywenderlich.com/59255/afnetworking-2-0-tutorial](http://www.raywenderlich.com/59255/afnetworking-2-0-tutorial)
 
 [http://nshipster.cn/afnetworking-2/](http://nshipster.cn/afnetworking-2/)
+
+
+    {% highlight objective-c %}
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:@"http://example.com/resources.json" parameters:nil
+    success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"JSON: %@", responseObject);
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"Error: %@", error);
+            }];
+    {% endhighlight %}
