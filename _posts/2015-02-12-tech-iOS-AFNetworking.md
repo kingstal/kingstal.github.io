@@ -328,7 +328,7 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 
 -	UIActivityIndicatorView+AFNetworking：根据指定的请求操作和会话任务的状态自动开始、停止 UIActivityIndicatorView。
 
--	UIProgressView+AFNetworking：自动跟踪某个请求或会话任务的上传/下载进度。 
+-	UIProgressView+AFNetworking：自动跟踪某个请求或会话任务的上传/下载进度。
 
 -   UIWebView+AFNetworking (新): 为加载 URL 请求提供了更强大的API，支持进度回调和内容转换。
 
