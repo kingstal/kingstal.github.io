@@ -16,7 +16,7 @@ iOS开发中往往会涉及到网络数据处理，在iOS 7之前，iOS提供的
 AFNetworking 包含的组件：
 - `AFURLConnectionOperation` - NSOperation 的子类，负责管理 NSURLConnection 并且实现其 delegate 方法。
 - `AFHTTPRequestOperation` - AFURLConnectionOperation 的子类，用于生成 HTTP 请求，可以区别可接受的和不可接受的状态码及内容类型。 2.0 版本中的最大区别是，你可以直接使用这个类，而不用继承它，原因可以在“序列化”一节中找到。
-- `AFHTTPRequestOperationManager` - 包装常见 HTTP web 服务操作的类，通过 AFHTTPRequestOperation 由 NSURLConnection 支持。
+- `AFHTTPRequestOperationManager` - 封装常见 HTTP web 服务操作的类，包括创建请求、响应序列化、网络可达性监测、安全性和请求操作管理。通过 AFHTTPRequestOperation 由 NSURLConnection 支持。
 
 ### NSURLSession (iOS 7 / Mac OS X 10.9)
 AFNetworking 包含的组件：
@@ -54,6 +54,253 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 -	AFSecurityPolicy
 -	AFNetworkReachabilityManager
 
+## 使用
+
+### `AFHTTPRequestOperationManager`
+
+> > `GET` Request
+
+    {% highlight objective-c %}
+    // GET
+    AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:@"http://example.com/resources.json"
+        parameters:nil
+        success:^(AFHTTPRequestOperation* operation, id responseObject) {
+             NSLog(@"JSON: %@", responseObject);
+        }
+        failure:^(AFHTTPRequestOperation* operation, NSError* error) {
+             NSLog(@"Error: %@", error);
+        }];
+    {% endhighlight %}
+
+
+> > `POST` URL-Form-Encoded Request
+
+    {% highlight objective-c %}
+    // POST
+    AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+    NSDictionary* parameters = @{ @"foo" : @"bar" };
+    [manager POST:@"http://example.com/resources.json"
+        parameters:parameters
+        success:^(AFHTTPRequestOperation* operation, id responseObject) {
+              NSLog(@"JSON: %@", responseObject);
+        }
+        failure:^(AFHTTPRequestOperation* operation, NSError* error) {
+              NSLog(@"Error: %@", error);
+        }];
+    {% endhighlight %}
+
+> > `POST` Multi-Part Request
+
+    {% highlight objective-c %}
+    // Multi-Part Request
+    AFHTTPRequestOperationManager* manager =
+        [AFHTTPRequestOperationManager manager];
+    NSDictionary* parameters = @{ @"foo" : @"bar" };
+    NSURL* filePath = [NSURL fileURLWithPath:@"file://path/to/image.png"];
+    [manager POST:@"http://example.com/resources.json"
+       parameters:parameters
+       constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+            [formData appendPartWithFileURL:filePath name:@"image" error:nil];
+        }
+          success:^(AFHTTPRequestOperation* operation, id responseObject) {
+              NSLog(@"Success: %@", responseObject);
+        }
+          failure:^(AFHTTPRequestOperation* operation, NSError* error) {
+              NSLog(@"Error: %@", error);
+        }];
+    {% endhighlight %}
+
+
+### `AFURLSessionManager`
+> > Creating a Download Task
+
+    {% highlight objective-c %}
+    // Creating a Download Task
+    NSURLSessionConfiguration* configuration =
+        [NSURLSessionConfiguration defaultSessionConfiguration];
+    AFURLSessionManager* manager =
+        [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+
+    NSURL* URL = [NSURL URLWithString:@"http://example.com/download.zip"];
+    NSURLRequest* request = [NSURLRequest requestWithURL:URL];
+
+    NSURLSessionDownloadTask* downloadTask
+        = [manager downloadTaskWithRequest:request
+                                  progress:nil
+                               destination:^NSURL*(NSURL* targetPath, NSURLResponse* response) {
+                                   NSURL* documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                               inDomain:NSUserDomainMask
+                                                                      appropriateForURL:nil
+                                                                                 create:NO
+                                                                                  error:nil];
+                                   return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                               }
+                         completionHandler:^(NSURLResponse* response, NSURL* filePath, NSError* error) {
+                             NSLog(@"File downloaded to: %@", filePath);
+                         }];
+    [downloadTask resume];
+    {% endhighlight %}
+
+> > Creating an Upload Task
+
+    {% highlight objective-c %}
+    // Creating an Upload Task
+    NSURLSessionConfiguration* configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+
+    NSURL* URL = [NSURL URLWithString:@"http://example.com/upload"];
+    NSURLRequest* request = [NSURLRequest requestWithURL:URL];
+    NSURL* filePath = [NSURL fileURLWithPath:@"file://path/to/image.png"];
+
+    NSURLSessionUploadTask* uploadTask
+        = [manager uploadTaskWithRequest:request
+                                fromFile:filePath
+                                progress:nil
+                       completionHandler:^(NSURLResponse* response, id responseObject, NSError* error) {
+                           if (error) {
+                               NSLog(@"Error: %@", error);
+                           } else {
+                               NSLog(@"Success: %@ %@", response, responseObject);
+                           }
+                       }];
+    [uploadTask resume];
+    {% endhighlight %}
+
+> > Creating an Upload Task for a Multi-Part Request, with Progress
+
+    {% highlight objective-c %}
+    // Creating an Upload Task for a Multi-Part Request, with Progress
+    NSMutableURLRequest* request
+        = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST"
+                                                                     URLString:@"http://example.com/upload"
+                                                                    parameters:nil
+                                                     constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                                         [formData appendPartWithFileURL:[NSURL fileURLWithPath:@"file://path/to/image.jpg"]
+                                                                                    name:@"file"
+                                                                                fileName:@"filename.jpg"
+                                                                                mimeType:@"image/jpeg"
+                                                                                   error:nil];
+                                                     }
+                                                                         error:nil];
+
+    AFURLSessionManager* manager
+        = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    NSProgress* progress = nil;
+
+    NSURLSessionUploadTask* uploadTask
+        = [manager uploadTaskWithStreamedRequest:request
+                                        progress:&progress
+                               completionHandler:^(NSURLResponse* response, id responseObject, NSError* error) {
+                                   if (error) {
+                                       NSLog(@"Error: %@", error);
+                                   } else {
+                                       NSLog(@"%@ %@", response, responseObject);
+                                   }
+                               }];
+
+    [uploadTask resume];
+    {% endhighlight %}
+
+> > Creating a Data Task
+
+    {% highlight objective-c %}
+    // Creating a Data Task
+    NSURLSessionConfiguration* configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:configuration];
+
+    NSURL* URL = [NSURL URLWithString:@"http://example.com/upload"];
+    NSURLRequest* request = [NSURLRequest requestWithURL:URL];
+
+    NSURLSessionDataTask* dataTask
+        = [manager dataTaskWithRequest:request
+                     completionHandler:^(NSURLResponse* response, id responseObject, NSError* error){
+                         if (error) {
+                             NSLog(@"Error: %@", error);
+                         } else {
+                             NSLog(@"%@ %@", response, responseObject);
+                         }
+                     }];
+    [dataTask resume];
+    {% endhighlight %}
+
+### 请求序列化
+Request serializer 可以从 URL 字符串、加密参数创建字符串查询或 HTTP body 请求。
+
+    {% highlight objective-c%}
+    // url strings 、encoding parameters
+    NSString *URLString = @"http://example.com";
+    _NSDictionary *parameters = @{@"foo": @"bar", @"baz": @[@1, @2, @3]};
+    {% endhighlight %}
+
+> > Query String Parameter Encoding
+
+`[[AFHTTPRequestSerializer serializer] requestWithMethod:@"GET" URLString:URLString parameters:parameters error:nil];`
+`GET http://example.com?foo=bar&baz[]=1&baz[]=2&baz[]=3`
+
+> > URL Form Parameter Encoding
+
+`[[AFHTTPRequestSerializer serializer] requestWithMethod:@"POST" URLString:URLString parameters:parameters];`
+
+`POST http://example.com/`
+
+`Content-Type:application/x-www-form-urlencoded`
+
+`foo=bar&baz[]=1&baz[]=2&baz[]=3`
+
+> > JSON Parameter Encoding
+
+`[[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:URLString parameters:parameters];`
+
+`POST http://example.com/`
+
+`Content-Type: application/json`
+
+`{"foo": "bar", "baz": [1,2,3]}`
+
+
+### AFHTTPRequestOperation
+尽管生成请求最好使用`AFHTTPRequestOperationManager`，但`AFHTTPRequestOperation`也可以独立使用。
+
+> > 使用`AFHTTPRequestOperation`进行 GET 请求
+
+    {% highlight objective-c %}
+    NSURL* URL = [NSURL URLWithString:@"http://example.com/resources/123.json"];
+    NSURLRequest* request = [NSURLRequest requestWithURL:URL];
+    AFHTTPRequestOperation* op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    op.responseSerializer = [AFJSONResponseSerializer serializer];
+    [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation* operation, id responseObject) {
+        NSLog(@"JSON: %@", responseObject);
+    } failure:^(AFHTTPRequestOperation* operation, NSError* error) {
+        NSLog(@"Error: %@", error);
+    }];
+    [[NSOperationQueue mainQueue] addOperation:op];
+    {% endhighlight %}
+
+> > 批处理
+
+    {% highlight objective-c %}
+    // 批处理
+    NSMutableArray* mutableOperations = [NSMutableArray array];
+    for (NSURL* fileURL in filesToUpload) {
+        NSURLRequest* request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:@"http://example.com/upload" parameters:nil constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+            [formData appendPartWithFileURL:fileURL name:@"images[]" error:nil];
+        }];
+
+        AFHTTPRequestOperation* operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+
+        [mutableOperations addObject:operation];
+    }
+
+    NSArray* operations = [AFURLConnectionOperation batchOfRequestOperations:@[... ] progressBlock:^(NSUInteger numberOfFinishedOperations, NSUInteger totalNumberOfOperations) {
+        NSLog(@"%lu of %lu complete", numberOfFinishedOperations, totalNumberOfOperations);
+    } completionBlock:^(NSArray* operations) {
+        NSLog(@"All operations in batch complete");
+    }];
+    [[NSOperationQueue mainQueue] addOperations:operations waitUntilFinished:NO];
+    {% endhighlight %}
+
+
 ## UIKit 扩展
 
 -	AFNetworkActivityIndicatorManager：在请求操作开始、停止加载时，自动开始、停止状态栏上的网络活动指示图标。
@@ -73,14 +320,3 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 [http://www.raywenderlich.com/59255/afnetworking-2-0-tutorial](http://www.raywenderlich.com/59255/afnetworking-2-0-tutorial)
 
 [http://nshipster.cn/afnetworking-2/](http://nshipster.cn/afnetworking-2/)
-
-
-    {% highlight objective-c %}
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    [manager GET:@"http://example.com/resources.json" parameters:nil
-    success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"JSON: %@", responseObject);
-        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-            NSLog(@"Error: %@", error);
-            }];
-    {% endhighlight %}
