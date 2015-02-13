@@ -4,7 +4,7 @@ title: CocoaPods
 category: 工具
 tags: CocoaPods
 keywords: CocoaPods
-description: CocoaPods使用说明
+description: CocoaPods使用过程的记录
 ---
 
 
