@@ -224,40 +224,6 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
     [dataTask resume];
     {% endhighlight %}
 
-### 请求序列化
-Request serializer 可以从 URL 字符串、加密参数创建字符串查询或 HTTP body 请求。
-
-    {% highlight objective-c%}
-    // url strings 、encoding parameters
-    NSString *URLString = @"http://example.com";
-    _NSDictionary *parameters = @{@"foo": @"bar", @"baz": @[@1, @2, @3]};
-    {% endhighlight %}
-
-> > Query String Parameter Encoding
-
-`[[AFHTTPRequestSerializer serializer] requestWithMethod:@"GET" URLString:URLString parameters:parameters error:nil];`
-`GET http://example.com?foo=bar&baz[]=1&baz[]=2&baz[]=3`
-
-> > URL Form Parameter Encoding
-
-`[[AFHTTPRequestSerializer serializer] requestWithMethod:@"POST" URLString:URLString parameters:parameters];`
-
-`POST http://example.com/`
-
-`Content-Type:application/x-www-form-urlencoded`
-
-`foo=bar&baz[]=1&baz[]=2&baz[]=3`
-
-> > JSON Parameter Encoding
-
-`[[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:URLString parameters:parameters];`
-
-`POST http://example.com/`
-
-`Content-Type: application/json`
-
-`{"foo": "bar", "baz": [1,2,3]}`
-
 
 ### AFHTTPRequestOperation
 尽管生成请求最好使用`AFHTTPRequestOperationManager`，但`AFHTTPRequestOperation`也可以独立使用。
@@ -265,16 +231,21 @@ Request serializer 可以从 URL 字符串、加密参数创建字符串查询�
 > > 使用`AFHTTPRequestOperation`进行 GET 请求
 
     {% highlight objective-c %}
+    // 1. urlsting->url->urlRequest
     NSURL* URL = [NSURL URLWithString:@"http://example.com/resources/123.json"];
     NSURLRequest* request = [NSURLRequest requestWithURL:URL];
+    // 2 新建 AFHTTPRequestOperation 并设置 responseSerializer：AFJSONResponseSerializer、AFPropertyListResponseSerializer等
     AFHTTPRequestOperation* op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     op.responseSerializer = [AFJSONResponseSerializer serializer];
+    // 3 设置 completion block
     [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation* operation, id responseObject) {
+        // serializer 会解析接收到的数据，返回一个responseObject
         NSLog(@"JSON: %@", responseObject);
     } failure:^(AFHTTPRequestOperation* operation, NSError* error) {
         NSLog(@"Error: %@", error);
     }];
-    [[NSOperationQueue mainQueue] addOperation:op];
+    // 4 开始
+    [operation start];//或    [[NSOperationQueue mainQueue] addOperation:op];
     {% endhighlight %}
 
 > > 批处理
@@ -301,17 +272,65 @@ Request serializer 可以从 URL 字符串、加密参数创建字符串查询�
     {% endhighlight %}
 
 
+### 最佳实践
+`AFHTTPRequestOperation`用于创建一次性的网络操作，而`AFHTTPRequestOperationManager`和`AFHTTPSessionManager`可方便的用于和单个 Web 服务终端交互。在项目中使用使用`AFHTTPSessionManager`可以使得网络通信代码复用：
+
+> 1. 为每一个 Web 服务创建一个子类。如在写一个社交网络整合的应用，可以为 Twitter、Facebook 等各建一个子类。
+> 2. 在每一个子类中创建一个类方法返回共享单例，可以节省资源。
+
+
+    {% highlight %}
+    //单例
+    + (WeatherHTTPClient*)sharedWeatherHTTPClient
+    {
+        static WeatherHTTPClient* _sharedWeatherHTTPClient = nil;
+
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            _sharedWeatherHTTPClient = [[self alloc] initWithBaseURL:[NSURL URLWithString:WorldWeatherOnlineURLString]];
+            });
+
+            return _sharedWeatherHTTPClient;
+        }
+    {% endhighlight %}
+
 ## UIKit 扩展
 
 -	AFNetworkActivityIndicatorManager：在请求操作开始、停止加载时，自动开始、停止状态栏上的网络活动指示图标。
 
--	UIImageView+AFNetworking：增加了 imageResponseSerializer 属性，可以轻松地让远程加载到 image view 上的图像自动调整大小或应用滤镜。比如，AFCoreImageSerializer 可以在 response 的图像显示之前应用 Core Image filter。
 
--	UIButton+AFNetworking (新)：与 UIImageView+AFNetworking 类似，从远程资源加载 image 和 backgroundImage。
+    {% highlight objective-c %}
+    // AFNetworkActivityIndicatorManager
+    [AFNetworkActivityIndicatorManager sharedManager].enabled = YES;
+    {% endhighlight %}
 
--	UIActivityIndicatorView+AFNetworking (新)：根据指定的请求操作和会话任务的状态自动开始、停止 UIActivityIndicatorView。
+-	UIImageView+AFNetworking（`setImageWithURLRequest:`）：增加了 imageResponseSerializer 属性，可以轻松地让远程加载到 image view 上的图像自动调整大小或应用滤镜。比如，AFCoreImageSerializer 可以在 response 的图像显示之前应用 Core Image filter。
 
--	UIProgressView+AFNetworking (新)：自动跟踪某个请求或会话任务的上传/下载进度。 UIWebView+AFNetworking (新): 为加载 URL 请求提供了更强大的API，支持进度回调和内容转换。
+
+    {% highlight objective-c %}
+    // UIImageView+AFNetworking
+    NSURL* url = [NSURL URLWithString:daysWeather.weatherIconURL];
+    NSURLRequest* request = [NSURLRequest requestWithURL:url];
+    UIImage* placeholderImage = [UIImage imageNamed:@"placeholder"];
+
+    __weak UITableViewCell* weakCell = cell;
+
+    [cell.imageView setImageWithURLRequest:request
+                          placeholderImage:placeholderImage
+                                   success:^(NSURLRequest* request, NSHTTPURLResponse* response, UIImage* image) {
+                                       weakCell.imageView.image = image;
+                                       [weakCell setNeedsLayout];
+                                   }
+                                   failure:nil];// 两个 block 都是可选的。若没有 success，imageView 自动设置远程图片，若有，则必须明确设置图片
+    {% endhighlight %}
+
+-	UIButton+AFNetworking：与 UIImageView+AFNetworking 类似，从远程资源加载 image 和 backgroundImage。
+
+-	UIActivityIndicatorView+AFNetworking：根据指定的请求操作和会话任务的状态自动开始、停止 UIActivityIndicatorView。
+
+-	UIProgressView+AFNetworking：自动跟踪某个请求或会话任务的上传/下载进度。 
+
+-   UIWebView+AFNetworking (新): 为加载 URL 请求提供了更强大的API，支持进度回调和内容转换。
 
 ## 参考
 
