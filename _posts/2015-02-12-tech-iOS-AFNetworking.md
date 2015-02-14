@@ -279,7 +279,7 @@ AFNetworking 2.0 新构架的突破之一是使用序列化来创建请求、解
 > 2. 在每一个子类中创建一个类方法返回共享单例，可以节省资源。
 
 
-    {% highlight %}
+    {% highlight objective-c %}
     //单例
     + (WeatherHTTPClient*)sharedWeatherHTTPClient
     {
