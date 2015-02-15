@@ -73,6 +73,12 @@ description: Masonry的介绍与使用
 > `center`:centerX and centerY
 
 
+**注**：第三方开源库[MMPlaceHolder](https://github.com/adad184/MMPlaceHolder)可以非常方便的显示`UIView`的大小，使用也非常方便，一行代码即可：
+> `[yourView showPlaceHolder];`
+效果图：
+![MMPlaceHolder](/Users/Arthur/Dropbox/blog/kingstal.github.io/assets/image/masonry-MMPlaceHolder.png)
+
+
 ### 参考
 [https://github.com/Masonry/Masonry](https://github.com/Masonry/Masonry)
 
