@@ -53,6 +53,7 @@ description: Masonry的介绍与使用
 
 
 ### 注意点
+
 #### 1. 参数可以是数组
 > `make.height.equalTo(@[view1, view3]); //can pass array of views`
 
@@ -61,6 +62,7 @@ description: Masonry的介绍与使用
 > `make.top.mas_equalTo(42);`
 > `make.edges.mas_equalTo(UIEdgeInsetsMake(10, 0, 10, 0));`
 > `make.left.mas_equalTo(view).mas_offset(UIEdgeInsetsMake(10, 0, 10, 0));`
+
 
 #### 3. 组合
 
