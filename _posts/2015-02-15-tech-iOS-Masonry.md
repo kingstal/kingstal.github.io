@@ -74,7 +74,7 @@ description: Masonry的介绍与使用
 
 
 **注**：第三方开源库[MMPlaceHolder](https://github.com/adad184/MMPlaceHolder)可以非常方便的显示`UIView`的大小，使用也非常方便，一行代码即可：
-> `[yourView showPlaceHolder];`
+> `[yourView showPlaceHolder];`  `showPlaceHolderWithAllSubviews`
 效果图：
 ![MMPlaceHolder](/assets/image/masonry-MMPlaceHolder.png)
 
