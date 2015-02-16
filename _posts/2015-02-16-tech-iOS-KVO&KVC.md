@@ -143,7 +143,7 @@ description: 介绍 KVO 和 KVC
                 [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     }
-
+    
     // 取消订阅
     -(void)dealloc{
         [_labColor removeObserver:self forKeyPath:NSStringFromSelector(@selector(color))];
