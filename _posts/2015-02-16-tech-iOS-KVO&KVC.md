@@ -100,7 +100,7 @@ description: 介绍 KVO 和 KVC
 > `+ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key`
 > `+ (NSSet *)keyPathsForValuesAffecting<Key>`
 
-    {% highlight objcetive-c %}
+    {% highlight objective-c %}
     // color 依赖于redComponent、greenComponent、blueComponent 三个属性
     + (NSSet *)keyPathsForValuesAffectingColor
     {
