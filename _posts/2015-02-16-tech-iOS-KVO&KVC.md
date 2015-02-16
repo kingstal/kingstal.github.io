@@ -16,7 +16,7 @@ description: 介绍 KVO 和 KVC
 发出通知的对象添加观察者
 
 
-    {% highlight objcetive-c %}
+    {% highlight objective-c %}
     // 注册观察者
     - (void)addObserver:(NSObject *)observer
              forKeyPath:(NSString *)keyPath
