@@ -9,12 +9,15 @@ description: 介绍 KVO 和 KVC
 
 `<NSKeyValueObserving>`或`KVO`是一种非正式协议，提供了一种常用机制用于对象之间的观察和通知状态变化。
 
-### **KVO**
+## **KVO**
 
 
-##### Subscribing 订阅
+
+### Subscribing 订阅
+
 
 发出通知的对象添加观察者
+
 
 
     {% highlight objective-c %}
@@ -36,7 +39,10 @@ description: 介绍 KVO 和 KVC
 > `context`: 在`observeValueForKeyPath:ofObject:change:context:`中传递给观察者的任意值
 
 
-##### `NSKeyValueObservingOptions`
+
+### `NSKeyValueObservingOptions`
+
+
 
 > `NSKeyValueObservingOptionNew`: `change dictionary`包含新的属性值
 
@@ -47,8 +53,10 @@ description: 介绍 KVO 和 KVC
 >`NSKeyValueObservingOptionPrior`:
 
 
-##### Responding 响应
+### Responding 响应
+
 观察者对通知做出响应
+
 
     {% highlight objective-c %}
     // 响应变化
@@ -59,25 +67,31 @@ description: 介绍 KVO 和 KVC
     {% endhighlight %}
 
 
-##### 正确的`Context`声明
+
+### 正确的`Context`声明
+
 建议采用以下方式声明：`static void * XXContext = &XXContext;`。
 它是一个静态值，储存它自身的指针，对于本身没意义，但对于`<NSKeyValueObserving>`非常完美，这样声明父类和子类都能观察到同一个对象的变化。
 
 > `static void * PrivateKVOContext = &PrivateKVOContext;`
 
 
-#### 更好的 KeyPath
+
+### 更好的 KeyPath
 
 由于拼写错误等原因，直接传递字符串作为**KeyPath**并不是好的选择，聪明的方法是使用以下方式传递**KeyPath**：
 
 > `NSStringFromSelector(@selector(propertyName))`
 
 
-##### Unsubscribing 取消订阅
+### Unsubscribing 取消订阅
+
 当观察者完成监听后，调用`removeObserver:forKeyPath:context:`取消订阅。通常在`-observeValueForKeyPath:ofObject:change:context:`或`-dealloc`中调用。
 
 
-##### 属性自动通知
+
+### 属性自动通知
+
 通过覆盖`+automaticallyNotifiesObserversForKey:`返回`NO`可实现手动通知。
 
 
@@ -95,7 +109,8 @@ description: 介绍 KVO 和 KVC
     {% endhighlight %}
 
 
-##### 属性依赖
+### 属性依赖
+
 有时候观察的属性依赖于其他的属性，这时候可以通过下面两种方式来声明依赖关系：
 
 > `+ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key`
@@ -110,8 +125,7 @@ description: 介绍 KVO 和 KVC
     {% endhighlight %}
 
 
-
-##### 我的实践
+### 我的实践
 
 > 声明 Context：`static void * PrivateKVOContext = &PrivateKVOContext;`
 
@@ -137,6 +151,6 @@ description: 介绍 KVO 和 KVC
     {% endhighlight %}
 
 
-### 参考
+## 参考
 
 [http://nshipster.com/key-value-observing/](http://nshipster.com/key-value-observing/)
