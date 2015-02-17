@@ -207,3 +207,5 @@ NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
 ## 参考
 
 [http://nshipster.com/key-value-observing/](http://nshipster.com/key-value-observing/)
+
+[http://www.objc.io/issue-7/key-value-coding-and-observing.html](http://www.objc.io/issue-7/key-value-coding-and-observing.html)
