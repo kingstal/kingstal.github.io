@@ -7,11 +7,58 @@ keywords: KVO,KVC
 description: 介绍 KVO 和 KVC
 ---
 
-`<NSKeyValueObserving>`或`KVO`是一种非正式协议，提供了一种常用机制用于对象之间的观察和通知状态变化。
+
+## **KVC**
+`<NSKeyValueCoding>`(KVC)是一种非正式协议，提供了一种通过对象名字(key)直接访问属性的机制。
+
+### 语法
+
+
+    {% highlight objective-c %}
+    // get
+    - (id)valueForKey:(NSString *)key
+    - (id)valueForKeyPath:(NSString *)keyPath
+    //举例：person 对象有一个address 属性，address有一个属性为 city
+    [person valueForKeyPath:@"address.city"]
+    // set
+    - (void)setValue:(id)value forKey:(NSString *)key
+    - (void)setValue:(id)value forKeyPath:(NSString *)keyPath
+    // validate
+    - (BOOL)validateValue:(inout id *)ioValue forKey:(NSString *)key error:(out NSError **)outError
+    - (BOOL)validateValue:(inout id *)ioValue forKeyPath:(NSString *)key error:(out NSError **)outError
+    {% endhighlight %}
+
+
+### Collection operators 集合运算符
+集合运算符允许使用 keypath 和运算符对集合中的对象进行运算。
+小例子：
+
+> `NSArray *a = @[@4, @84, @2];
+NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
+
+#### 简单的集合运算符
+
+1. @avg `NSNumber *transactionAverage = [transactions valueForKeyPath:@"@avg.amount"];`
+2. @count `NSNumber *numberOfTransactions = [transactions valueForKeyPath:@"@count"];`
+3. @max `NSDate *latestDate = [transactions valueForKeyPath:@"@max.date"];`
+4. @min
+5. @sum
+
+
+#### 对象运算符
+
+1. @distinctUnionOfObjects `NSArray *payees = [transactions valueForKeyPath:@"@distinctUnionOfObjects.payee"];`
+2. @unionOfObjects `NSArray *payees = [transactions valueForKeyPath:@"@unionOfObjects.payee"];`
+
+#### 数组和集合运算符
+1. @distinctUnionOfArrays `NSArray *payees = [arrayOfTransactionsArrays valueForKeyPath:@"@distinctUnionOfArrays.payee"];`
+2. @unionOfArrays
+3. @distinctUnionOfSets
+
 
 ## **KVO**
 
-
+`<NSKeyValueObserving>`或`KVO`是一种非正式协议，提供了一种常用机制用于对象之间的观察和通知状态变化。
 
 ### Subscribing 订阅
 
@@ -145,6 +192,7 @@ description: 介绍 KVO 和 KVC
     }
     {% endhighlight %}
 
+
 >   {% highlight objective-c %}
     // 取消订阅
     -(void)dealloc{
@@ -152,6 +200,9 @@ description: 介绍 KVO 和 KVC
     }
     {% endhighlight %}
 
+
+### **常见误区**
+集合是不能被关注的，KVO 只能关注关系而非集合。举例说明，假如有一个`ContactList`对象，我们能使用`-addObserver:forKeyPath:`关注它的`contacts`属性，而非直接让数组`contacts`作为被观察者。
 
 ## 参考
 
