@@ -53,7 +53,7 @@ description: 介绍如何使用 Python 来写爬虫
 
 ![burpsuite-result](/assets/image/Python-spider-BurpSuite-result.png)
 
-通过尝试可以发现上图即为网站返回的数据，这是查看`request`部分，即可发现这次访问的 API。
+通过尝试可以发现上图即为网站返回的数据，这时查看`request`部分，即可发现这次访问的 API。
 
 ![result-request](/assets/image/Python-spider-result-request.png)
 
