@@ -48,7 +48,7 @@ description: 介绍如何使用 Python 来写爬虫
 
 ![burpsuite](/images/2015/03/Python-spider-burpsuite.png)
 
-然后将**SwitchyOmega（原来的版本是Proxy SwitchySharp）**切换到刚配置的** Burp Suite**。
+然后将**SwitchyOmega（原来的版本是Proxy SwitchySharp）**切换到刚配置的 **Burp Suite**。
 这时候访问网页的数据都能捕获到。
 
 ![burpsuite-result](/images/2015/03/Python-spider-BurpSuite-result.png)
@@ -78,7 +78,7 @@ description: 介绍如何使用 Python 来写爬虫
         for each_item in result:
             #print(each_item['url'])
             file_to_save.writelines(each_item['url'] + '\n')
-            
+
         file_to_save.close()
 
     if __name__ == '__main__':
