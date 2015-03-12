@@ -1,11 +1,24 @@
+---
+layout: post
+title: GCD
+category: 技术
+tags: GCD
+keywords: GCD
+description: 介绍 GCD 的相关 API，以及如何使用 GCD 实现多线程。
+---
+GCD是 libdispatch 的统称，而 libdispatch 是苹果为了在多核硬件（如iOS、OS X）上提供处理并发代码的库。
+
+
 ### 队列类型
+
+![gcd.png](/assets/image/gcd-queues.png)
+
 1. 主队列（**main queue**）：系统提供了一个叫做 `主队列（main queue）`的特殊队列，它和**串行队列**一样，在同一时间只能执行一个任务。然而，能保证所有的任务都在主线程上执行，只有主线程是唯一一个被允许去刷新UI的线程。这个队列是**用于给UIView发送消息或推送通知**。
 2. 并发队列：系统提供了几个并发线程。比如说：`全局调度队列（Global Dispatch Queues）`。目前全局队列有四种不同的优先级：后台`（background）`、低`（low）`、默认`（default）`和高`（high）`。你应该要明白，Apple的API也会使用这些队列，所以你**添加的任何任务都不会是这些队列中唯一的任务**。
 3. 自己创建的串行或并行队列
 
 > - `dispatch_queue_t dispatch_get_main_queue ( void );`
 - `dispatch_queue_t dispatch_get_global_queue ( long identifier, unsigned long flags );`
-
 
 
 ### 后台任务
@@ -16,10 +29,36 @@
 
 下面是一个关于在 `dispatch_async` 上如何以及何时使用不同的队列类型的快速指导：
 
-
 1. **自定义串行队列**：当你想串行执行后台任务并追踪它时就是一个好选择。这消除了资源争用，因为你知道一次只有一个任务在执行。注意若你需要来自某个方法的数据，你必须内联另一个 Block 来找回它或考虑使用 dispatch_sync。
 2. **主队列（串行）**：这是在一个并发队列上完成任务后**更新 UI** 的共同选择。要这样做，你将在一个 Block 内部编写另一个 Block 。以及，如果你在主队列调用 dispatch_async 到主队列，你能确保这个新任务将在当前方法完成后的某个时间执行。
 3. **并发队列**：这是在后台执行非 UI 工作的共同选择。
+
+
+    {% highlight objective-c %}
+    // 异步任务
+    - (void)viewDidLoad
+    {
+        [super viewDidLoad];
+        NSAssert(_image, @"Image not set; required to use view controller");
+        self.photoImageView.image = _image;
+
+        //Resize if neccessary to ensure it's not pixelated
+        if (_image.size.height <= self.photoImageView.bounds.size.height &&
+            _image.size.width <= self.photoImageView.bounds.size.width) {
+            [self.photoImageView setContentMode:UIViewContentModeCenter];
+        }
+
+        // 注释，采用 dispatch_async 替代
+        //    UIImage *overlayImage = [self faceOverlayImageFromImage:_image];
+        //    [self fadeInNewImage:overlayImage];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{//1.首先将工作从主线程移到全局线程。因为这是一个 dispatch_async() ，Block 会被异步地提交，意味着调用线程的执行将会继续。这就使得 viewDidLoad 更早地在主线程完成，让加载过程感觉起来更加快速。同时，一个人脸检测过程会启动并将在稍后完成。
+            UIImage*overlayImage = [self faceOverlayImageFromImage:_image];
+            dispatch_async(dispatch_get_main_queue(), ^{//2.人脸检测过程完成，并生成了一个新的图像。既然你要使用此新图像更新你的 UIImageView ，那么你就添加一个新的 Block 到主线程。记住——你必须总是在主线程访问 UIKit 的类。
+                [self fadeInNewImage:overlayImage];//3.最后，你用 fadeInNewImage: 更新 UI ，它执行一个淡入过程切换到新的icon眼睛图像
+            });
+        });
+    }
+    {% endhighlight %}
 
 
 ### 延后任务
@@ -35,10 +74,42 @@
 3. **并发队列**：在并发队列上使用 dispatch_after 也要小心；你会这样做就比较罕见。还是在主队列做这些操作吧。
 
 
+    {% highlight objective-c %}
+    // 延后任务
+    - (void)showOrHideNavPrompt
+    {
+        NSUInteger count = [[PhotoManager sharedManager] photos].count;
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)); // 1.声明了一个变量指定要延迟的时长。
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ // 2.然后等待 delayInSeconds 给定的时长，再异步地添加一个 Block 到主线程。
+            if (!count) {
+                [self.navigationItem setPrompt:@"Add photos with faces to Googlyify them!"];
+            } else {
+                [self.navigationItem setPrompt:nil];
+            }
+        });
+    }
+    {% endhighlight %}
+
+
 ### 单例
 > - `typedef long dispatch_once_t;`变量必须是`global`或`static`，和 `dispatch_once`一起使用
 > - `void dispatch_once ( dispatch_once_t *predicate, dispatch_block_t block );`在整个应用程序生命周期，`block`执行且只执行一次，用于创建单例
 
+
+    {% highlight objective-c %}
+    // 单例
+    + (instancetype)sharedManager
+    {
+        static PhotoManager *sharedPhotoManager = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            sharedPhotoManager = [[PhotoManager alloc] init];
+            sharedPhotoManager->_photosArray = [NSMutableArray array];
+        });
+        return sharedPhotoManager;
+    }
+    {% endhighlight %}
 
 ### 读者与写者
 
@@ -101,9 +172,23 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
 
 
     {% highlight objective-c %}
-    // 实例化自定义队列
-    sharedPhotoManager->_concurrentPhotoQueue = dispatch_queue_create("com.selander.GooglyPuff.photoQueue",DISPATCH_QUEUE_CONCURRENT);
-    //使用 dispatch_queue_create 初始化 concurrentPhotoQueue 为一个并发队列。第一个参数是反向DNS样式命名惯例；确保它是描述性的，将有助于调试。第二个参数指定你的队列是串行还是并发。
+
+    + (instancetype)sharedManager
+    {
+        static PhotoManager *sharedPhotoManager = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            sharedPhotoManager = [[PhotoManager alloc] init];
+            sharedPhotoManager->_photosArray = [NSMutableArray array];
+
+            // ADD THIS:
+            // 实例化自定义队列
+            sharedPhotoManager->_concurrentPhotoQueue = dispatch_queue_create("com.selander.GooglyPuff.photoQueue",DISPATCH_QUEUE_CONCURRENT);
+            //使用 dispatch_queue_create 初始化 concurrentPhotoQueue 为一个并发队列。第一个参数是反向DNS样式命名惯例；确保它是描述性的，将有助于调试。第二个参数指定你的队列是串行还是并发。
+        });
+        return sharedPhotoManager;
+    }
+
     {% endhighlight %}
 
 
@@ -212,3 +297,11 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
 
 
 > - `void dispatch_group_notify ( dispatch_group_t group, dispatch_queue_t queue, dispatch_block_t block );`：不会阻塞当前线程
+
+
+
+### 参考
+
+[http://www.anselz.com/2014/04/20/深入了解gcd：part12/](http://www.anselz.com/2014/04/20/深入了解gcd：part12/)
+
+[http://www.anselz.com/2014/05/05/深入了解gcd：part-22/](http://www.anselz.com/2014/05/05/深入了解gcd：part-22/)
