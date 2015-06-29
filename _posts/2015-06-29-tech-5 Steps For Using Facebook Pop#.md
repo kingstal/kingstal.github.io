@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 ---
 layout: post
 title: Mantle
