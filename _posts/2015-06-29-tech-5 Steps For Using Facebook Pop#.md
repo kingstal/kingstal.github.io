@@ -13,7 +13,7 @@ description: Facebook Pop Tutorial
 
 #5 Steps For Using Facebook Pop#
 
-```objective-c
+{% highlight objective-c %}
   // 1. Pick a Kind Of Animation 
   //  POPBasicAnimation  POPSpringAnimation POPDecayAnimation
   POPSpringAnimation *basicAnimation = [POPSpringAnimation animation];
@@ -35,7 +35,7 @@ description: Facebook Pop Tutorial
 
   // 5. Add animation to View or Layer, we picked View so self.tableView and not layer which would have been self.tableView.layer
   [self.tableView pop_addAnimation:basicAnimation forKey:@"WhatEverNameYouWant"];
-```
+{% endhighlight %}
 
 
 ## Step 1 Pick Kind of Animation
@@ -265,6 +265,5 @@ basicAnimation.delegate=self;
   basicAnimation.delegate=self;
   [self.tableView pop_addAnimation:basicAnimation forKey:@"WhatEverNameYouWant"];
 ```
-
 
 
