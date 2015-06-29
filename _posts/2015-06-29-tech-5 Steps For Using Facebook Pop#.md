@@ -8,7 +8,7 @@ description: Facebook Pop Tutorial
 ---
 
 
-`转载[https://github.com/maxmyers/FacebookPop/blob/master/README.md](https://github.com/maxmyers/FacebookPop/blob/master/README.md)`
+转载[https://github.com/maxmyers/FacebookPop/blob/master/README.md](https://github.com/maxmyers/FacebookPop/blob/master/README.md)
 
 
 #5 Steps For Using Facebook Pop#
