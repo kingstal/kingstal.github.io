@@ -1,16 +1,18 @@
 ---
 layout: post
-title: Mantle
+title: Facebook Pop Tutorial
 category: 技术
-tags: JSON,Mantle
-keywords: JSON,Mantle
-description: Mantle 用于 JSON 和 Model 之间的转换
+tags: Facebook Pop
+keywords: Facebook Pop
+description: Facebook Pop Tutorial
 ---
+
 
 `转载[https://github.com/maxmyers/FacebookPop/blob/master/README.md](https://github.com/maxmyers/FacebookPop/blob/master/README.md)`
 
 
 #5 Steps For Using Facebook Pop#
+
 ```objective-c
   // 1. Pick a Kind Of Animation 
   //  POPBasicAnimation  POPSpringAnimation POPDecayAnimation
