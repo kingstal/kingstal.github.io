@@ -34,31 +34,31 @@ GCD是 libdispatch 的统称，而 libdispatch 是苹果为了在多核硬件（
 3. **并发队列**：这是在后台执行非 UI 工作的共同选择。
 
 
-    {% highlight objective-c %}
-    // 异步任务
-    - (void)viewDidLoad
-    {
-        [super viewDidLoad];
-        NSAssert(_image, @"Image not set; required to use view controller");
-        self.photoImageView.image = _image;
+```objc
+// 异步任务
+* (void)viewDidLoad
+{
+    [super viewDidLoad];
+    NSAssert(_image, @"Image not set; required to use view controller");
+    self.photoImageView.image = _image;
 
-        //Resize if neccessary to ensure it's not pixelated
-        if (_image.size.height <= self.photoImageView.bounds.size.height &&
-            _image.size.width <= self.photoImageView.bounds.size.width) {
-            [self.photoImageView setContentMode:UIViewContentModeCenter];
-        }
-
-        // 注释，采用 dispatch_async 替代
-        //    UIImage *overlayImage = [self faceOverlayImageFromImage:_image];
-        //    [self fadeInNewImage:overlayImage];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{//1.首先将工作从主线程移到全局线程。因为这是一个 dispatch_async() ，Block 会被异步地提交，意味着调用线程的执行将会继续。这就使得 viewDidLoad 更早地在主线程完成，让加载过程感觉起来更加快速。同时，一个人脸检测过程会启动并将在稍后完成。
-            UIImage*overlayImage = [self faceOverlayImageFromImage:_image];
-            dispatch_async(dispatch_get_main_queue(), ^{//2.人脸检测过程完成，并生成了一个新的图像。既然你要使用此新图像更新你的 UIImageView ，那么你就添加一个新的 Block 到主线程。记住——你必须总是在主线程访问 UIKit 的类。
-                [self fadeInNewImage:overlayImage];//3.最后，你用 fadeInNewImage: 更新 UI ，它执行一个淡入过程切换到新的icon眼睛图像
-            });
-        });
+    //Resize if neccessary to ensure it's not pixelated
+    if (_image.size.height <= self.photoImageView.bounds.size.height &&
+        _image.size.width <= self.photoImageView.bounds.size.width) {
+        [self.photoImageView setContentMode:UIViewContentModeCenter];
     }
-    {% endhighlight %}
+
+    // 注释，采用 dispatch_async 替代
+    //    UIImage *overlayImage = [self faceOverlayImageFromImage:_image];
+    //    [self fadeInNewImage:overlayImage];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{//1.首先将工作从主线程移到全局线程。因为这是一个 dispatch_async() ，Block 会被异步地提交，意味着调用线程的执行将会继续。这就使得 viewDidLoad 更早地在主线程完成，让加载过程感觉起来更加快速。同时，一个人脸检测过程会启动并将在稍后完成。
+        UIImage*overlayImage = [self faceOverlayImageFromImage:_image];
+        dispatch_async(dispatch_get_main_queue(), ^{//2.人脸检测过程完成，并生成了一个新的图像。既然你要使用此新图像更新你的 UIImageView ，那么你就添加一个新的 Block 到主线程。记住——你必须总是在主线程访问 UIKit 的类。
+            [self fadeInNewImage:overlayImage];//3.最后，你用 fadeInNewImage: 更新 UI ，它执行一个淡入过程切换到新的icon眼睛图像
+        });
+    });
+}
+```
 
 
 ### 延后任务
@@ -74,22 +74,22 @@ GCD是 libdispatch 的统称，而 libdispatch 是苹果为了在多核硬件（
 3. **并发队列**：在并发队列上使用 dispatch_after 也要小心；你会这样做就比较罕见。还是在主队列做这些操作吧。
 
 
-    {% highlight objective-c %}
-    // 延后任务
-    - (void)showOrHideNavPrompt
-    {
-        NSUInteger count = [[PhotoManager sharedManager] photos].count;
-        double delayInSeconds = 1.0;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)); // 1.声明了一个变量指定要延迟的时长。
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ // 2.然后等待 delayInSeconds 给定的时长，再异步地添加一个 Block 到主线程。
-            if (!count) {
-                [self.navigationItem setPrompt:@"Add photos with faces to Googlyify them!"];
-            } else {
-                [self.navigationItem setPrompt:nil];
-            }
-        });
-    }
-    {% endhighlight %}
+```objc
+// 延后任务
+* (void)showOrHideNavPrompt
+{
+    NSUInteger count = [[PhotoManager sharedManager] photos].count;
+    double delayInSeconds = 1.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)); // 1.声明了一个变量指定要延迟的时长。
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ // 2.然后等待 delayInSeconds 给定的时长，再异步地添加一个 Block 到主线程。
+        if (!count) {
+            [self.navigationItem setPrompt:@"Add photos with faces to Googlyify them!"];
+        } else {
+            [self.navigationItem setPrompt:nil];
+        }
+    });
+}
+```
 
 
 ### 单例
@@ -97,19 +97,19 @@ GCD是 libdispatch 的统称，而 libdispatch 是苹果为了在多核硬件（
 > - `void dispatch_once ( dispatch_once_t *predicate, dispatch_block_t block );`在整个应用程序生命周期，`block`执行且只执行一次，用于创建单例
 
 
-    {% highlight objective-c %}
-    // 单例
-    + (instancetype)sharedManager
-    {
-        static PhotoManager *sharedPhotoManager = nil;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            sharedPhotoManager = [[PhotoManager alloc] init];
-            sharedPhotoManager->_photosArray = [NSMutableArray array];
-        });
-        return sharedPhotoManager;
-    }
-    {% endhighlight %}
+```objc
+// 单例
+- (instancetype)sharedManager
+{
+    static PhotoManager *sharedPhotoManager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedPhotoManager = [[PhotoManager alloc] init];
+        sharedPhotoManager->_photosArray = [NSMutableArray array];
+    });
+    return sharedPhotoManager;
+}
+```
 
 ### 读者与写者
 
@@ -126,20 +126,20 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
 > - `void dispatch_barrier_async ( dispatch_queue_t queue, dispatch_block_t block );`异步提交一个`barrier block`到队列，立即返回
 
 
-    {% highlight objective-c %}
-    // 写者
-    - (void)addPhoto:(Photo *)photo,
-    {
-        if (photo) { // 1. 在执行下面所有的工作前检查是否有合法的相片
-            dispatch_barrier_async(self.concurrentPhotoQueue, ^{ // 2. 添加写操作到你的自定义队列。当临界区在稍后执行时，这将是你队列中唯一执行的条目。
-                [_photosArray addObject:photo]; // 3. 这是添加对象到数组的实际代码。由于它是一个障碍 Block ，这个 Block 永远不会同时和其它 Block 一起在 concurrentPhotoQueue 中执行。
-                dispatch_async(dispatch_get_main_queue(), ^{ // 4. 发送一个通知说明完成了添加图片。这个通知将在主线程被发送因为它将会做一些 UI 工作，所以在此为了通知，你异步地调度另一个任务到主线程。
-                    [self postContentAddedNotification];
-                });
+```objc
+// 写者
+* (void)addPhoto:(Photo *)photo,
+{
+    if (photo) { // 1. 在执行下面所有的工作前检查是否有合法的相片
+        dispatch_barrier_async(self.concurrentPhotoQueue, ^{ // 2. 添加写操作到你的自定义队列。当临界区在稍后执行时，这将是你队列中唯一执行的条目。
+            [_photosArray addObject:photo]; // 3. 这是添加对象到数组的实际代码。由于它是一个障碍 Block ，这个 Block 永远不会同时和其它 Block 一起在 concurrentPhotoQueue 中执行。
+            dispatch_async(dispatch_get_main_queue(), ^{ // 4. 发送一个通知说明完成了添加图片。这个通知将在主线程被发送因为它将会做一些 UI 工作，所以在此为了通知，你异步地调度另一个任务到主线程。
+                [self postContentAddedNotification];
             });
-        }
+        });
     }
-    {% endhighlight %}
+}
+```
 
 
 > - `void dispatch_sync ( dispatch_queue_t queue, dispatch_block_t block );`
@@ -152,17 +152,17 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
 3. **并发队列**：这才是做同步工作的好选择，不论是通过调度障碍，或者需要等待一个任务完成才能执行进一步处理的情况。
 
 
-    {% highlight objective-c %}
-    // 读者
-    - (NSArray *)photos
-    {
-        __block NSArray *array; // 1.  __block 关键字允许对象在 Block 内可变。没有它，array 在 Block 内部就只是只读的，你的代码甚至不能通过编译。
-        dispatch_sync(self.concurrentPhotoQueue, ^{ // 2. 在 concurrentPhotoQueue 上同步调度来执行读操作。
-            array = [NSArray arrayWithArray:_photosArray]; // 3. 将相片数组存储在 array 内并返回它。
-        });
-        return array;
-    }
-    {% endhighlight %}
+```objc
+// 读者
+* (NSArray *)photos
+{
+    __block NSArray *array; // 1.  __block 关键字允许对象在 Block 内可变。没有它，array 在 Block 内部就只是只读的，你的代码甚至不能通过编译。
+    dispatch_sync(self.concurrentPhotoQueue, ^{ // 2. 在 concurrentPhotoQueue 上同步调度来执行读操作。
+        array = [NSArray arrayWithArray:_photosArray]; // 3. 将相片数组存储在 array 内并返回它。
+    });
+    return array;
+}
+```
 
 
 最后实例化自定义队列`concurrentPhotoQueue`：
@@ -171,25 +171,25 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
 > - `dispatch_queue_t dispatch_queue_create ( const char *label, dispatch_queue_attr_t attr );`创建一个自定义的队列
 
 
-    {% highlight objective-c %}
+```objc
 
-    + (instancetype)sharedManager
-    {
-        static PhotoManager *sharedPhotoManager = nil;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            sharedPhotoManager = [[PhotoManager alloc] init];
-            sharedPhotoManager->_photosArray = [NSMutableArray array];
+- (instancetype)sharedManager
+{
+    static PhotoManager *sharedPhotoManager = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedPhotoManager = [[PhotoManager alloc] init];
+        sharedPhotoManager->_photosArray = [NSMutableArray array];
 
-            // ADD THIS:
-            // 实例化自定义队列
-            sharedPhotoManager->_concurrentPhotoQueue = dispatch_queue_create("com.selander.GooglyPuff.photoQueue",DISPATCH_QUEUE_CONCURRENT);
-            //使用 dispatch_queue_create 初始化 concurrentPhotoQueue 为一个并发队列。第一个参数是反向DNS样式命名惯例；确保它是描述性的，将有助于调试。第二个参数指定你的队列是串行还是并发。
-        });
-        return sharedPhotoManager;
-    }
+        // ADD THIS:
+        // 实例化自定义队列
+        sharedPhotoManager->_concurrentPhotoQueue = dispatch_queue_create("com.selander.GooglyPuff.photoQueue",DISPATCH_QUEUE_CONCURRENT);
+        //使用 dispatch_queue_create 初始化 concurrentPhotoQueue 为一个并发队列。第一个参数是反向DNS样式命名惯例；确保它是描述性的，将有助于调试。第二个参数指定你的队列是串行还是并发。
+    });
+    return sharedPhotoManager;
+}
 
-    {% endhighlight %}
+```
 
 
 ### 调度组（dispatch_group）
@@ -201,64 +201,12 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
 **1.dispatch_group_wait**：它会阻塞当前线程，直到组里面所有的任务都完成或者等到某个超时发生。
 
 
-    {% highlight objective-c %}
-    // dispatch_group_wait
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{ // 1. 因为你在使用的是同步的 dispatch_group_wait ，它会阻塞当前线程，所以你要用 dispatch_async 将整个方法放入后台队列以避免阻塞主线程。
+```objc
+// dispatch_group_wait
+dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{ // 1. 因为你在使用的是同步的 dispatch_group_wait ，它会阻塞当前线程，所以你要用 dispatch_async 将整个方法放入后台队列以避免阻塞主线程。
 
-        __block NSError *error;
-        dispatch_group_t downloadGroup = dispatch_group_create(); // 2. 创建一个新的 Dispatch Group，它的作用就像一个用于未完成任务的计数器。
-
-        for (NSInteger i = 0; i < 3; i++) {
-            NSURL *url;
-            switch (i) {
-                case 0:
-                    url = [NSURL URLWithString:kOverlyAttachedGirlfriendURLString];
-                    break;
-                case 1:
-                    url = [NSURL URLWithString:kSuccessKidURLString];
-                    break;
-                case 2:
-                    url = [NSURL URLWithString:kLotsOfFacesURLString];
-                    break;
-                default:
-                    break;
-            }
-
-            dispatch_group_enter(downloadGroup); // 3. dispatch_group_enter 手动通知 Dispatch Group 任务已经开始。你必须保证 dispatch_group_enter 和 dispatch_group_leave 成对出现，否则你可能会遇到诡异的崩溃问题。
-            Photo *photo = [[Photo alloc] initwithURL:url
-                                  withCompletionBlock:^(UIImage *image, NSError *_error) {
-                                      if (_error) {
-                                          error = _error;
-                                      }
-                                      dispatch_group_leave(downloadGroup); // 4. 手动通知 Group 它的工作已经完成。再次说明，你必须要确保进入 Group 的次数和离开 Group 的次数相等。
-                                  }];
-
-            [[PhotoManager sharedManager] addPhoto:photo];
-        }
-        dispatch_group_wait(downloadGroup, DISPATCH_TIME_FOREVER); // 5. dispatch_group_wait 会一直等待，直到任务全部完成或者超时。如果在所有任务完成前超时了，该函数会返回一个非零值。你可以对此返回值做条件判断以确定是否超出等待周期；然而，你在这里用 DISPATCH_TIME_FOREVER 让它永远等待。它的意思，勿庸置疑就是，永－远－等－待！这样很好，因为图片的创建工作总是会完成的。
-        dispatch_async(dispatch_get_main_queue(), ^{ // 6. 此时此刻，你已经确保了，要么所有的图片任务都已完成，要么发生了超时。然后，你在主线程上运行 completionBlock 回调。这会将工作放到主线程上，并在稍后执行。
-            if (completionBlock) { // 7. 最后，检查 completionBlock 是否为 nil，如果不是，那就运行它。
-                completionBlock(error);
-            }
-        });
-    });
-    {% endhighlight %}
-
-
-> - `typedef struct dispatch_group_s *dispatch_group_t;`：调度组（group of block）
-> - `dispatch_group_t dispatch_group_create ( void );`：创建调度组
-> - `void dispatch_group_enter ( dispatch_group_t group );`：block进入调度组
-> - `void dispatch_group_leave ( dispatch_group_t group );`：block离开调度组，成对出现
-> - `long dispatch_group_wait ( dispatch_group_t group, dispatch_time_t timeout );`：同步等待`group`中的`block`完成，知道 timeout，会阻塞当前线程
-
-
-**2.dispatch_group_notify**：异步方式通知
-
-    {% highlight objective-c %}
-    // dispatch_group_notify
-    // 1. 在新的实现里，因为你没有阻塞主线程，所以你并不需要将方法包裹在 async 调用中。
     __block NSError *error;
-    dispatch_group_t downloadGroup = dispatch_group_create();
+    dispatch_group_t downloadGroup = dispatch_group_create(); // 2. 创建一个新的 Dispatch Group，它的作用就像一个用于未完成任务的计数器。
 
     for (NSInteger i = 0; i < 3; i++) {
         NSURL *url;
@@ -276,24 +224,76 @@ GCD 通过用 `dispatch barriers` 创建一个读者写者锁。
                 break;
         }
 
-        dispatch_group_enter(downloadGroup); // 2. 同样的 enter 方法，没做任何修改。
+        dispatch_group_enter(downloadGroup); // 3. dispatch_group_enter 手动通知 Dispatch Group 任务已经开始。你必须保证 dispatch_group_enter 和 dispatch_group_leave 成对出现，否则你可能会遇到诡异的崩溃问题。
         Photo *photo = [[Photo alloc] initwithURL:url
                               withCompletionBlock:^(UIImage *image, NSError *_error) {
                                   if (_error) {
                                       error = _error;
                                   }
-                                  dispatch_group_leave(downloadGroup); // 3. 同样的 leave 方法，也没做任何修改。
+                                  dispatch_group_leave(downloadGroup); // 4. 手动通知 Group 它的工作已经完成。再次说明，你必须要确保进入 Group 的次数和离开 Group 的次数相等。
                               }];
 
         [[PhotoManager sharedManager] addPhoto:photo];
     }
-
-    dispatch_group_notify(downloadGroup, dispatch_get_main_queue(), ^{ // 4. dispatch_group_notify 以异步的方式工作。当 Dispatch Group 中没有任何任务时，它就会执行其代码，那么 completionBlock 便会运行。你还指定了运行 completionBlock 的队列，此处，主队列就是你所需要的。
-        if (completionBlock) {
+    dispatch_group_wait(downloadGroup, DISPATCH_TIME_FOREVER); // 5. dispatch_group_wait 会一直等待，直到任务全部完成或者超时。如果在所有任务完成前超时了，该函数会返回一个非零值。你可以对此返回值做条件判断以确定是否超出等待周期；然而，你在这里用 DISPATCH_TIME_FOREVER 让它永远等待。它的意思，勿庸置疑就是，永－远－等－待！这样很好，因为图片的创建工作总是会完成的。
+    dispatch_async(dispatch_get_main_queue(), ^{ // 6. 此时此刻，你已经确保了，要么所有的图片任务都已完成，要么发生了超时。然后，你在主线程上运行 completionBlock 回调。这会将工作放到主线程上，并在稍后执行。
+        if (completionBlock) { // 7. 最后，检查 completionBlock 是否为 nil，如果不是，那就运行它。
             completionBlock(error);
         }
     });
-    {% endhighlight %}
+});
+```
+
+
+> - `typedef struct dispatch_group_s *dispatch_group_t;`：调度组（group of block）
+> - `dispatch_group_t dispatch_group_create ( void );`：创建调度组
+> - `void dispatch_group_enter ( dispatch_group_t group );`：block进入调度组
+> - `void dispatch_group_leave ( dispatch_group_t group );`：block离开调度组，成对出现
+> - `long dispatch_group_wait ( dispatch_group_t group, dispatch_time_t timeout );`：同步等待`group`中的`block`完成，知道 timeout，会阻塞当前线程
+
+
+**2.dispatch_group_notify**：异步方式通知
+
+```objc
+// dispatch_group_notify
+// 1. 在新的实现里，因为你没有阻塞主线程，所以你并不需要将方法包裹在 async 调用中。
+__block NSError *error;
+dispatch_group_t downloadGroup = dispatch_group_create();
+
+for (NSInteger i = 0; i < 3; i++) {
+    NSURL *url;
+    switch (i) {
+        case 0:
+            url = [NSURL URLWithString:kOverlyAttachedGirlfriendURLString];
+            break;
+        case 1:
+            url = [NSURL URLWithString:kSuccessKidURLString];
+            break;
+        case 2:
+            url = [NSURL URLWithString:kLotsOfFacesURLString];
+            break;
+        default:
+            break;
+    }
+
+    dispatch_group_enter(downloadGroup); // 2. 同样的 enter 方法，没做任何修改。
+    Photo *photo = [[Photo alloc] initwithURL:url
+                          withCompletionBlock:^(UIImage *image, NSError *_error) {
+                              if (_error) {
+                                  error = _error;
+                              }
+                              dispatch_group_leave(downloadGroup); // 3. 同样的 leave 方法，也没做任何修改。
+                          }];
+
+    [[PhotoManager sharedManager] addPhoto:photo];
+}
+
+dispatch_group_notify(downloadGroup, dispatch_get_main_queue(), ^{ // 4. dispatch_group_notify 以异步的方式工作。当 Dispatch Group 中没有任何任务时，它就会执行其代码，那么 completionBlock 便会运行。你还指定了运行 completionBlock 的队列，此处，主队列就是你所需要的。
+    if (completionBlock) {
+        completionBlock(error);
+    }
+});
+```
 
 
 > - `void dispatch_group_notify ( dispatch_group_t group, dispatch_queue_t queue, dispatch_block_t block );`：不会阻塞当前线程

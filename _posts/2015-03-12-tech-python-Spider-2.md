@@ -13,7 +13,7 @@ description: 介绍如何使用 Python 来写爬虫
 
 
 ```python
-// 抓取网易云音乐
+# 抓取网易云音乐
 import requests
 
 url = 'http://music.163.com//api/dj/program/byradio?radioId=271002&id=271002&ids=%5B%22271002%22%5D&limit=100&offset=0'

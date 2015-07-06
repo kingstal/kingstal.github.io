@@ -27,17 +27,17 @@ description: MagicalRecord 可简化 Core Data 操作的代码，并支持将 JS
 #### 1. 支持 KeyPath
 
 
-    {% highlight objective-c %}
-    // 将对应属性的 mappedKeyName 设置为 location.latitude 和 location.longitude
+```objc
+// 将对应属性的 mappedKeyName 设置为 location.latitude 和 location.longitude
+{
+    "name": "Point Of Origin",
+    "location":
     {
-        "name": "Point Of Origin",
-        "location":
-        {
-        "latitude": 0.00,
-        "longitude": 0.00
-        }
+    "latitude": 0.00,
+    "longitude": 0.00
     }
-    {% endhighlight %}
+}
+```
 
 
 #### 2. 通过 Keys 来关联
@@ -48,13 +48,13 @@ description: MagicalRecord 可简化 Core Data 操作的代码，并支持将 JS
 #### 3. 与一组值关联
 
 
-    {% highlight objective-c %}
-    // 对应多个值
-    {
-        "name": "Title of Blog post",
-        "attachments": [3, 5, 100]
-    }
-    {% endhighlight %}
+```objc
+// 对应多个值
+{
+    "name": "Title of Blog post",
+    "attachments": [3, 5, 100]
+}
+```
 
 
 这时只要配置满足下面两个条件，`MagicalRecord`就能导入数据：
@@ -81,25 +81,25 @@ description: MagicalRecord 可简化 Core Data 操作的代码，并支持将 JS
 > `- (BOOL) shouldImport;` 
 
 
-    {% highlight objective-c %}
-    // 自定义导入
-    - (void)didImport:(id)data
-    {
-        if (NO == [data isKindOfClass:[NSDictionary class]]) {
-          return;
-        }
-      
-        NSDictionary *dataDictionary = (NSDictionary *)data;
-    
-        id identifierValue = dataDictionary[@"my_identifier"];
-    
-        if ([identifierValue isKindOfClass:[NSNumber class]]) {
-          NSNumber *numberValue = (NSNumber *)identifierValue;
-    
-          self.identifier = [numberValue stringValue];
-        }
+```objc
+// 自定义导入
+* (void)didImport:(id)data
+{
+    if (NO == [data isKindOfClass:[NSDictionary class]]) {
+      return;
     }
-    {% endhighlight %}
+  
+    NSDictionary *dataDictionary = (NSDictionary *)data;
+
+    id identifierValue = dataDictionary[@"my_identifier"];
+
+    if ([identifierValue isKindOfClass:[NSNumber class]]) {
+      NSNumber *numberValue = (NSNumber *)identifierValue;
+
+      self.identifier = [numberValue stringValue];
+    }
+}
+```
 
 还可以对特定属性或关系配置导入：
 
@@ -109,21 +109,21 @@ description: MagicalRecord 可简化 Core Data 操作的代码，并支持将 JS
 
 
 
-    {% highlight objective-c %}
-    // 自定义属性 keywords
-    - (BOOL) importKeywords:(id)data;
-    {
-        NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" ,"];
-        self.keywords = [data componentsSeparatedByCharactersInSet:set];
-        return YES;
-    }
+```objc
+// 自定义属性 keywords
+* (BOOL) importKeywords:(id)data;
+{
+    NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" ,"];
+    self.keywords = [data componentsSeparatedByCharactersInSet:set];
+    return YES;
+}
 
-    - (BOOL) shouldImportContacts:(id)data;
-    {
-        NSString *zipCode = [[data lastObject] valueForKey:@"zipCode"];
-        return IsFormattedAsZipPlusFour(zipCode);
-    }
-    {% endhighlight %}
+* (BOOL) shouldImportContacts:(id)data;
+{
+    NSString *zipCode = [[data lastObject] valueForKey:@"zipCode"];
+    return IsFormattedAsZipPlusFour(zipCode);
+}
+```
 
 
 ### 导入

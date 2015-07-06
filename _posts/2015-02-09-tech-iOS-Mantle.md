@@ -20,32 +20,31 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
 
 下面看一个实例。
 
-
-    {% highlight objective-c %}
-    // Member.h
-    @interface Member : MTLModel<MTLJSONSerializing>
-    @property (nonatomic, retain) NSString * memberID;
-    @property (nonatomic, retain) NSString * mobilePhone;
-    @property (nonatomic, retain) NSDate * createDate;
-    @property (nonatomic, retain) NSNumber *goldNumber;
-    @property (nonatomic, assign) NSUInteger age;
-    @property (nonatomic, assign) BOOL isVip;
-    @property (nonatomic, retain) NSURL *url;
-    {% endhighlight %}
-
+```objc
+// Member.h
+@interface Member : MTLModel<MTLJSONSerializing>
+@property (nonatomic, retain) NSString * memberID;
+@property (nonatomic, retain) NSString * mobilePhone;
+@property (nonatomic, retain) NSDate * createDate;
+@property (nonatomic, retain) NSNumber *goldNumber;
+@property (nonatomic, assign) NSUInteger age;
+@property (nonatomic, assign) BOOL isVip;
+@property (nonatomic, retain) NSURL *url;
+```
 
 
 
-    {% highlight objective-c %}
-    // Member.m
-    //当property 和 json keypath 的名称相同时，可忽略
-    + (NSDictionary *)JSONKeyPathsByPropertyKey{
-        return @{@"memberID" : @"id",//支持 keypath，如“location.latitude”
-            @"mobilePhone" : @"phone",
-            @"createDate" : @"date"
-        };
-    }
-    {% endhighlight %}
+
+```objc
+// Member.m
+//当property 和 json keypath 的名称相同时，可忽略
+- (NSDictionary *)JSONKeyPathsByPropertyKey{
+    return @{@"memberID" : @"id",//支持 keypath，如“location.latitude”
+        @"mobilePhone" : @"phone",
+        @"createDate" : @"date"
+    };
+}
+```
 
 
 
@@ -56,29 +55,29 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
 具体实现：
 
 
-    {% highlight objective-c %}
-    //属性值转换
-    + (NSValueTransformer *)JSONTransformerForKey:(NSString *)key{
-        if ([key isEqualToString:@"createDate"]) {
-            return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
-                //NSString-->NSDate
-                return [self.dateFormatter dateFromString:string];
-            } reverseBlock:^id(NSDate *date) {
-                //NSDate-->NSString
-                return [self.dateFormatter stringFromDate:date];
-            }];
-        }
-        else{
-            return nil;
-        }
+```objc
+//属性值转换
+- (NSValueTransformer *)JSONTransformerForKey:(NSString *)key{
+    if ([key isEqualToString:@"createDate"]) {
+        return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
+            //NSString-->NSDate
+            return [self.dateFormatter dateFromString:string];
+        } reverseBlock:^id(NSDate *date) {
+            //NSDate-->NSString
+            return [self.dateFormatter stringFromDate:date];
+        }];
     }
+    else{
+        return nil;
+    }
+}
 
-    + (NSDateFormatter *)dateFormatter {
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.dateFormat = @"yyyy-MM-dd";
-        return dateFormatter;
-    }
-    {% endhighlight %}
+- (NSDateFormatter *)dateFormatter {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy-MM-dd";
+    return dateFormatter;
+}
+```
 
 > `+ (instancetype)reversibleTransformerWithForwardBlock:(MTLValueTransformerBlock)forwardBlock reverseBlock:(MTLValueTransformerBlock)reverseBlock;`
 
@@ -89,31 +88,31 @@ Mantle 提供了一个基类：MTLModel，如果想使用 Mantle 的各种功能
 Mantle 还提供了另一种转换方式，同样的实现上述功能：
 
 
-    {% highlight objective-c %}
-    // 针对特定的属性进行转换
-    + (NSValueTransformer *)createDateJSONTransformer{
-        return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
-            return [self.dateFormatter dateFromString:string];
-        } reverseBlock:^id(NSDate *date) {
-             return [self.dateFormatter stringFromDate:date];
-        }];
-    }
-    {% endhighlight %}
+```objc
+// 针对特定的属性进行转换
+- (NSValueTransformer *)createDateJSONTransformer{
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *string) {
+        return [self.dateFormatter dateFromString:string];
+    } reverseBlock:^id(NSDate *date) {
+         return [self.dateFormatter stringFromDate:date];
+    }];
+}
+```
 
 方法命名规则是：`+<key>JSONTransformer`，另外对于BOOL和NSURL类型的有更快捷的方法：
 
 
-    {% highlight objective-c %}
-    // URL 转换的快捷方法
-    + (NSValueTransformer *)urlJSONTransformer{
-        return [NSValueTransformer valueTransformerForName:MTLURLValueTransformerName];
-    }
+```objc
+// URL 转换的快捷方法
+- (NSValueTransformer *)urlJSONTransformer{
+    return [NSValueTransformer valueTransformerForName:MTLURLValueTransformerName];
+}
 
-    // BOOL 类型转换的快捷方法
-    + (NSValueTransformer *)isVipJSONTransformer{
-        return [NSValueTransformer valueTransformerForName:MTLBooleanValueTransformerName];
-    }
-    {% endhighlight %}
+// BOOL 类型转换的快捷方法
+- (NSValueTransformer *)isVipJSONTransformer{
+    return [NSValueTransformer valueTransformerForName:MTLBooleanValueTransformerName];
+}
+```
 
 
 > 空对象处理
@@ -121,17 +120,17 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 有时候 JSON 传过来的对象值为空，这时需要对空对象进行处理。假定`@"isVip" : NSNull.null`
 
 
-    {% highlight objective-c %}
-    // 这种问题其实只针对于非指针类型，像float，bool，double
-    - (void)setNilValueForKey:(NSString *)key{
-        if ([key isEqualToString:@"isVip"]) {
-            self.isVip = 0;
-        }
-        else{
-            [super setNilValueForKey:key];
-        }
+```objc
+// 这种问题其实只针对于非指针类型，像float，bool，double
+* (void)setNilValueForKey:(NSString *)key{
+    if ([key isEqualToString:@"isVip"]) {
+        self.isVip = 0;
     }
-    {% endhighlight %}
+    else{
+        [super setNilValueForKey:key];
+    }
+}
+```
 
 **这时，就可以调用`MTLJSONAdapter`的类方法实现 JSON <---> model 的互相转换。**
 
@@ -143,20 +142,20 @@ Mantle 还提供了另一种转换方式，同样的实现上述功能：
 具体参看如下：
 
 
-    {% highlight objective-c %}
-    // 调用MTLJSONAdapter的类方法
-    NSDictionary *response = @{@"id" : @"1",
-                          @"phone" : @"xxxxxx",
-                          @"date" : @"2014-09-09",
-                          @"goldNumber" : @2,
-                          @"age" : @"18",
-                          @"url" : @"http://bawn.github.io/",
-                          @"isVip" : NSNull.null
-                          };
-    Member *member = [MTLJSONAdapter modelOfClass:[Member class] fromJSONDictionary:response error:nil];
+```objc
+// 调用MTLJSONAdapter的类方法
+NSDictionary *response = @{@"id" : @"1",
+                      @"phone" : @"xxxxxx",
+                      @"date" : @"2014-09-09",
+                      @"goldNumber" : @2,
+                      @"age" : @"18",
+                      @"url" : @"http://bawn.github.io/",
+                      @"isVip" : NSNull.null
+                      };
+Member *member = [MTLJSONAdapter modelOfClass:[Member class] fromJSONDictionary:response error:nil];
 
-    NSDictionary *dictionary = [MTLJSONAdapter JSONDictionaryFromModel:member];
-    {% endhighlight %}
+NSDictionary *dictionary = [MTLJSONAdapter JSONDictionaryFromModel:member];
+```
 
 ### 2. Core Data 相关
 Mantle提供了一个专门操作Core Data的协议`<MTLManagedObjectSerializing>`，常见的方法有以下几个：

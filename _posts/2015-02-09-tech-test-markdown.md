@@ -62,23 +62,20 @@ description: 测试Markdown的语法，同时留作以后参考
 代码区块很简单，只要简单地缩进 4 个空格或是 1 个制表符就可以
 
     
-    {% highlight objective-c %}
-    
-        +(NSDictionary *)JSONKeyPathsByPropertyKey {
-        return @{
-        @"date" : @"dt", //将JSON字典里dt键对应的值，赋值给date属性
-        @"locationName" : @"name",
-        @"humidity" : @"main.humidity",
-        @"temperature" : @"main.temp", 
-        @"tempHigh" : @"main.temp_max",
-        @"tempLow" : @"main.temp_min",
-      };
-    }
-    
-    {% endhighlight %}
-        
-  
-  
+```objc
+
+    +(NSDictionary *)JSONKeyPathsByPropertyKey {
+    return @{
+    @"date" : @"dt", //将JSON字典里dt键对应的值，赋值给date属性
+    @"locationName" : @"name",
+    @"humidity" : @"main.humidity",
+    @"temperature" : @"main.temp", 
+    @"tempHigh" : @"main.temp_max",
+    @"tempLow" : @"main.temp_min",
+  };
+}
+
+```
   
   
 -------------------------
@@ -107,43 +104,41 @@ This is [我的github](https://github.com/kingstal) inline link.
 
 
 
-    {% highlight ruby %}
-        def foo
-        puts 'foo'
-    end
-    {% endhighlight %}
-    
+```ruby
+    def foo
+    puts 'foo'
+end
+```
 
-    {% highlight objective-c %}
-        -(void)getName{
-    return @"wangminjun";
-    }
-    {% endhighlight %}
-    
 
-    {% highlight python %}
-        import this
-    print 'something'
-    {% endhighlight %}
-    
+```objc
+    -(void)getName{
+return @"wangminjun";
+}
+```
+
+
+```python
+    import this
+print 'something'
+```
+ 
 测试
     
     
-    {% highlight objective-c %}
-    
-        - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-    {
-        if ([segue.identifier isEqualToString:@"TagLocation"]) {
-        UINavigationController *navigationController = segue.destinationViewController;
-        LocationDetailsViewController *controller = (LocationDetailsViewController *)navigationController.topViewController;
-        controller.coordinate = _location.coordinate;
-        controller.placemark = _placemark;
-        controller.managedObjectContext = self.managedObjectContext;
-        }
+```objc
+
+    * (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"TagLocation"]) {
+    UINavigationController *navigationController = segue.destinationViewController;
+    LocationDetailsViewController *controller = (LocationDetailsViewController *)navigationController.topViewController;
+    controller.coordinate = _location.coordinate;
+    controller.placemark = _placemark;
+    controller.managedObjectContext = self.managedObjectContext;
     }
-    
-    {% endhighlight %}
-    
-    
+}
+
+```
     
     

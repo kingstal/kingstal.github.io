@@ -15,27 +15,27 @@ description: 介绍如何使用 Python 来写爬虫
 上代码：
 
 
-    {% highlight Python %}
-    # 获取煎蛋网的图片 url 保存到本地文件
-    from pyquery import PyQuery as pq #利用 pyquery 来解析
+```python
+# 获取煎蛋网的图片 url 保存到本地文件
+from pyquery import PyQuery as pq #利用 pyquery 来解析
 
-    fileToSave = open('imglinks.txt','w')
+fileToSave = open('imglinks.txt','w')
 
-    for page_number in range(6100,6110): #网页的第6100~6110
-        url = "http://jandan.net/pic/page-" + str(page_number)
-        html_content = pq(url)
+for page_number in range(6100,6110): #网页的第6100~6110
+    url = "http://jandan.net/pic/page-" + str(page_number)
+    html_content = pq(url)
 
-        jpg_container = []
-        for anchor in html_content('#comments p>img'): #图片的标签路径
-            anchor = html_content(anchor)
-            jpg_link = anchor.attr('src') #获取图片标签的 src 属性即为 url
-            jpg_container.append(jpg_link)
+    jpg_container = []
+    for anchor in html_content('#comments p>img'): #图片的标签路径
+        anchor = html_content(anchor)
+        jpg_link = anchor.attr('src') #获取图片标签的 src 属性即为 url
+        jpg_container.append(jpg_link)
 
-            fileToSave.write(jpg_link+'\n')
-        print(page_number)
+        fileToSave.write(jpg_link+'\n')
+    print(page_number)
 
-    fileToSave.close
-    {% endhighlight %}
+fileToSave.close
+```
 
 
 ### 获取动态网页的数据
@@ -60,31 +60,31 @@ description: 介绍如何使用 Python 来写爬虫
 有了 API 就可以使用`python`来模仿请求了，上代码：
 
 
-    {% highlight Python %}
-    # 获取荔枝 FM 的 mp3
-    import requests #第三方包
-    import json
+```python
+# 获取荔枝 FM 的 mp3
+import requests #第三方包
+import json
 
-    #定义方法，参数分别是 FM的id、mp3的数量
-    def get_lizhifm_mp3link(radio_id,mp3_number):
-        file_to_save = open('mp3link.txt','w') #开一个文件，保存数据
+#定义方法，参数分别是 FM的id、mp3的数量
+def get_lizhifm_mp3link(radio_id,mp3_number):
+    file_to_save = open('mp3link.txt','w') #开一个文件，保存数据
 
-        r = requests.get('http://www.lizhi.fm/api/radio_audios?band=' + str(radio_id) + '&s=0&l=' + str(mp3_number))
-        content = r.text
+    r = requests.get('http://www.lizhi.fm/api/radio_audios?band=' + str(radio_id) + '&s=0&l=' + str(mp3_number))
+    content = r.text
 
-        #print(content.encode('utf8'))
+    #print(content.encode('utf8'))
 
-        result = json.loads(content)
-        for each_item in result:
-            #print(each_item['url'])
-            file_to_save.writelines(each_item['url'] + '\n')
+    result = json.loads(content)
+    for each_item in result:
+        #print(each_item['url'])
+        file_to_save.writelines(each_item['url'] + '\n')
 
-        file_to_save.close()
+    file_to_save.close()
 
-    if __name__ == '__main__':
-        get_lizhifm_mp3link(14275,100)
+if __name__ == '__main__':
+    get_lizhifm_mp3link(14275,100)
 
-    {% endhighlight %}
+```
 
 
 

@@ -14,19 +14,19 @@ description: 介绍 KVO 和 KVC
 ### 语法
 
 
-    {% highlight objective-c %}
-    // get
-    - (id)valueForKey:(NSString *)key
-    - (id)valueForKeyPath:(NSString *)keyPath
-    //举例：person 对象有一个address 属性，address有一个属性为 city
-    [person valueForKeyPath:@"address.city"]
-    // set
-    - (void)setValue:(id)value forKey:(NSString *)key
-    - (void)setValue:(id)value forKeyPath:(NSString *)keyPath
-    // validate
-    - (BOOL)validateValue:(inout id *)ioValue forKey:(NSString *)key error:(out NSError **)outError
-    - (BOOL)validateValue:(inout id *)ioValue forKeyPath:(NSString *)key error:(out NSError **)outError
-    {% endhighlight %}
+```objc
+// get
+* (id)valueForKey:(NSString *)key
+* (id)valueForKeyPath:(NSString *)keyPath
+//举例：person 对象有一个address 属性，address有一个属性为 city
+[person valueForKeyPath:@"address.city"]
+// set
+* (void)setValue:(id)value forKey:(NSString *)key
+* (void)setValue:(id)value forKeyPath:(NSString *)keyPath
+// validate
+* (BOOL)validateValue:(inout id *)ioValue forKey:(NSString *)key error:(out NSError **)outError
+* (BOOL)validateValue:(inout id *)ioValue forKeyPath:(NSString *)key error:(out NSError **)outError
+```
 
 
 ### Collection operators 集合运算符
@@ -67,13 +67,13 @@ NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
 
 
 
-    {% highlight objective-c %}
-    // 注册观察者
-    - (void)addObserver:(NSObject *)observer
-             forKeyPath:(NSString *)keyPath
-                options:(NSKeyValueObservingOptions)options
-                context:(void *)context
-    {% endhighlight %}
+```objc
+// 注册观察者
+* (void)addObserver:(NSObject *)observer
+         forKeyPath:(NSString *)keyPath
+            options:(NSKeyValueObservingOptions)options
+            context:(void *)context
+```
 
 
 
@@ -105,13 +105,13 @@ NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
 观察者对通知做出响应
 
 
-    {% highlight objective-c %}
-    // 响应变化
-    - (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context
-    {% endhighlight %}
+```objc
+// 响应变化
+* (void)observeValueForKeyPath:(NSString *)keyPath
+                  ofObject:(id)object
+                    change:(NSDictionary *)change
+                   context:(void *)context
+```
 
 
 
@@ -142,18 +142,18 @@ NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
 通过覆盖`+automaticallyNotifiesObserversForKey:`返回`NO`可实现手动通知。
 
 
-    {% highlight objective-c %}
-    // 在 setter 方法中手动调用 willChangeValueForKey 和 didChangeValueForKey
-    - (void)setLComponent:(double)lComponent;
-    {
-        if (_lComponent == lComponent) {
-            return;
-        }
-        [self willChangeValueForKey:@"lComponent"];
-        _lComponent = lComponent;
-        [self didChangeValueForKey:@"lComponent"];
+```objc
+// 在 setter 方法中手动调用 willChangeValueForKey 和 didChangeValueForKey
+* (void)setLComponent:(double)lComponent;
+{
+    if (_lComponent == lComponent) {
+        return;
     }
-    {% endhighlight %}
+    [self willChangeValueForKey:@"lComponent"];
+    _lComponent = lComponent;
+    [self didChangeValueForKey:@"lComponent"];
+}
+```
 
 
 ### 属性依赖
@@ -163,13 +163,13 @@ NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
 > `+ (NSSet *)keyPathsForValuesAffectingValueForKey:(NSString *)key`
 > `+ (NSSet *)keyPathsForValuesAffecting<Key>`
 
-    {% highlight objective-c %}
-    // color 依赖于redComponent、greenComponent、blueComponent 三个属性
-    + (NSSet *)keyPathsForValuesAffectingColor
-    {
-        return [NSSet setWithObjects:@"redComponent", @"greenComponent", @"blueComponent", nil];
-    }
-    {% endhighlight %}
+```objc
+// color 依赖于redComponent、greenComponent、blueComponent 三个属性
+- (NSSet *)keyPathsForValuesAffectingColor
+{
+    return [NSSet setWithObjects:@"redComponent", @"greenComponent", @"blueComponent", nil];
+}
+```
 
 
 ### 我的实践
@@ -178,27 +178,27 @@ NSLog(@"max = %@", [a valueForKeyPath:@"@max.self"]);`
 
 > 添加观察者：`[labColor addObserver:self forKeyPath:NSStringFromSelector(@selector(color)) options:NSKeyValueObservingOptionInitial context:&PrivateKVOContext];`
 
->   {% highlight objective-c %}
-    // 响应变化
-    -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-        if (context == &PrivateKVOContext) {
-            // Observe values here
-            if ([keyPath isEqualToString:NSStringFromSelector(@selector(color))]) {
-                [self colorDidChange:change];
-            }
-            } else {
-                [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+```objc
+// 响应变化
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+    if (context == &PrivateKVOContext) {
+        // Observe values here
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(color))]) {
+            [self colorDidChange:change];
         }
+        } else {
+            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
-    {% endhighlight %}
+}
+```
 
 
->   {% highlight objective-c %}
-    // 取消订阅
-    -(void)dealloc{
-        [_labColor removeObserver:self forKeyPath:NSStringFromSelector(@selector(color))];
-    }
-    {% endhighlight %}
+```objc
+// 取消订阅
+-(void)dealloc{
+    [_labColor removeObserver:self forKeyPath:NSStringFromSelector(@selector(color))];
+}
+```
 
 
 ### **常见误区**

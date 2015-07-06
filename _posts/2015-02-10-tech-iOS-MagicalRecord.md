@@ -92,15 +92,15 @@ MagicalRecord 的三个目标：
 
 
 
-    {% highlight objective-c %}
-    // 返回 NSFetchRequest
-    NSPredicate *peopleFilter = [NSPredicate predicateWithFormat:@"Department IN %@", departments];
-    NSFetchRequest *peopleRequest = [Person MR_requestAllWithPredicate:peopleFilter];
-    // 自定义 NSFetchRequest
-    [peopleRequest setReturnsDistinctResults:NO];
-    [peopleRequest setReturnPropertiesNamed:@[@"FirstName", @"LastName"]];
-    NSArray *people = [Person MR_executeFetchRequest:peopleRequest];
-    {% endhighlight %}
+```objc
+// 返回 NSFetchRequest
+NSPredicate *peopleFilter = [NSPredicate predicateWithFormat:@"Department IN %@", departments];
+NSFetchRequest *peopleRequest = [Person MR_requestAllWithPredicate:peopleFilter];
+// 自定义 NSFetchRequest
+[peopleRequest setReturnsDistinctResults:NO];
+[peopleRequest setReturnPropertiesNamed:@[@"FirstName", @"LastName"]];
+NSArray *people = [Person MR_executeFetchRequest:peopleRequest];
+```
 
 
 **返回 Entity 的数量**：
@@ -111,75 +111,75 @@ MagicalRecord 的三个目标：
 **聚合操作**：
 
 
-    {% highlight objective-c %}
-    // 聚合操作
-    NSNumber *totalCalories = [CTFoodDiaryEntry MR_aggregateOperation:@"sum:"
-                                                      onAttribute:@"calories"
-                                                    withPredicate:predicate];
+```objc
+// 聚合操作
+NSNumber *totalCalories = [CTFoodDiaryEntry MR_aggregateOperation:@"sum:"
+                                                  onAttribute:@"calories"
+                                                withPredicate:predicate];
 
-    NSNumber *mostCalories  = [CTFoodDiaryEntry MR_aggregateOperation:@"max:"
-                                                      onAttribute:@"calories"
-                                                    withPredicate:predicate];
+NSNumber *mostCalories  = [CTFoodDiaryEntry MR_aggregateOperation:@"max:"
+                                                  onAttribute:@"calories"
+                                                withPredicate:predicate];
 
-    NSArray *caloriesByMonth = [CTFoodDiaryEntry MR_aggregateOperation:@"sum:"
-                                                       onAttribute:@"calories"
-                                                     withPredicate:predicate
-                                                           groupBy:@"month"];
-    {% endhighlight %}
+NSArray *caloriesByMonth = [CTFoodDiaryEntry MR_aggregateOperation:@"sum:"
+                                                   onAttribute:@"calories"
+                                                 withPredicate:predicate
+                                                       groupBy:@"month"];
+```
 
 ### 5. 保存 Entity
 
 
 
-    {% highlight objective-c %}
-    // NSManagedObjectContext+MagicalSaves
-    - (void) MR_saveOnlySelfWithCompletion:(MRSaveCompletionHandler)completion; // Asynchronously
-    - (void) MR_saveToPersistentStoreWithCompletion:(MRSaveCompletionHandler)completion; // Asynchronously
-    - (void) MR_saveOnlySelfAndWait; // Synchronously
-    - (void) MR_saveToPersistentStoreAndWait; // Synchronously
-    - (void) MR_saveWithOptions:(MRSaveContextOptions)mask completion:(MRSaveCompletionHandler)completion;
+```objc
+// NSManagedObjectContext+MagicalSaves
++ (void) MR_saveOnlySelfWithCompletion:(MRSaveCompletionHandler)completion; // Asynchronously
++ (void) MR_saveToPersistentStoreWithCompletion:(MRSaveCompletionHandler)completion; // Asynchronously
++ (void) MR_saveOnlySelfAndWait; // Synchronously
++ (void) MR_saveToPersistentStoreAndWait; // Synchronously
++ (void) MR_saveWithOptions:(MRSaveContextOptions)mask completion:(MRSaveCompletionHandler)completion;
 
-    // MagicalRecord+Actions
-    + (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block; // Asynchronously
-    + (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion; // Asynchronously
-    + (void) saveWithBlockAndWait:(void(^)(NSManagedObjectContext *localContext))block;
-    + (void) saveUsingCurrentThreadContextWithBlock:(void (^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion;
-    + (void) saveUsingCurrentThreadContextWithBlockAndWait:(void (^)(NSManagedObjectContext *localContext))block;
-    {% endhighlight %}
+// MagicalRecord+Actions
+* (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block; // Asynchronously
+* (void) saveWithBlock:(void(^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion; // Asynchronously
+* (void) saveWithBlockAndWait:(void(^)(NSManagedObjectContext *localContext))block;
+* (void) saveUsingCurrentThreadContextWithBlock:(void (^)(NSManagedObjectContext *localContext))block completion:(MRSaveCompletionHandler)completion;
+* (void) saveUsingCurrentThreadContextWithBlockAndWait:(void (^)(NSManagedObjectContext *localContext))block;
+```
 
 下面看一个实例：
 
 
 
-    {% highlight objective-c %}
-    // 0. setup
-    [MagicalRecord setupCoreDataStackWithStoreNamed:@"Model"];
+```objc
+// 0. setup
+[MagicalRecord setupCoreDataStackWithStoreNamed:@"Model"];
 
-    // 1. insert
-    for (int i = 1; i < 5; i++) {
-        Person* p = [Person MR_createEntity];
-        p.name = [NSString stringWithFormat:@"p%d", i];
-        p.age = [NSNumber numberWithInt:i];
+// 1. insert
+for (int i = 1; i < 5; i++) {
+    Person* p = [Person MR_createEntity];
+    p.name = [NSString stringWithFormat:@"p%d", i];
+    p.age = [NSNumber numberWithInt:i];
+}
+
+// 2. delete
+Person* pd = [Person MR_findFirst];
+[pd MR_deleteEntity];
+
+// 3. update
+Person* pu = [Person MR_findFirstByAttribute:@"name" withValue:@"p2"];
+pu.name = @"p22";
+
+// 4. save
+[[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreWithCompletion:^(BOOL success, NSError* error) {
+    if (success) {
+        NSLog(@"***save success!***");
     }
-
-    // 2. delete
-    Person* pd = [Person MR_findFirst];
-    [pd MR_deleteEntity];
-
-    // 3. update
-    Person* pu = [Person MR_findFirstByAttribute:@"name" withValue:@"p2"];
-    pu.name = @"p22";
-
-    // 4. save
-    [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreWithCompletion:^(BOOL success, NSError* error) {
-        if (success) {
-            NSLog(@"***save success!***");
-        }
-        else {
-            NSLog(@"***save failure!***");
-        }
-    }];
-    {% endhighlight %}
+    else {
+        NSLog(@"***save failure!***");
+    }
+}];
+```
 
 
 上述主要讲了如何使用`MagicalRecord`来简化 CoreData 操作的代码，下一篇将主要介绍[如何使用`MagicalRecord`向 CoreData 导入 JSON 数据](http://kingstal.github.io/2015/02/11/tech-iOS-MagicalRecord-2.html)。

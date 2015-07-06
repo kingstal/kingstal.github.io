@@ -16,12 +16,12 @@ description: Masonry的介绍与使用
 ### 语法
 
 
-    {% highlight objective-c %}
-    // 为 view1 添加约束
-    [view1 mas_makeConstraints:^(MASConstraintMaker *make) {
-    make.edges.equalTo(superview).with.insets(padding);
-    }];
-    {% endhighlight %}
+```objc
+// 为 view1 添加约束
+[view1 mas_makeConstraints:^(MASConstraintMaker *make) {
+make.edges.equalTo(superview).with.insets(padding);
+}];
+```
 
 
 约束可以是：
