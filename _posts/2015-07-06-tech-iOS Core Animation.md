@@ -7,7 +7,7 @@ keywords: Core Animation
 description: Core Animation
 ---
 
-# 寄宿图
+## 寄宿图
 - contents：图片	`layer.contents = (__bridge id)image.CGImage;`
 - contentsGravity：图片显示模式	  `layer.contentsGravity = kCAGravityResizeAspect;`
 - contentsScale：图片缩放（适配 Retina）`layer.contentsScale = [UIScreen mainScreen].scale;`
@@ -15,7 +15,7 @@ description: Core Animation
 - contentsRect：图片显示区域（矩形），使用单位坐标，默认(0,0,1,1)  `layer.contentsRect = CGRectMake(0, 0, 0.5, 0.5);`
 - contentsCenter：是一个CGRect，它定义了一个固定的边框和一个在图层上可拉伸的区域，类似于`UIImage`的`resizableImageWithCapInsets:`  `layer.contentsCenter = CGRectMake(0.25, 0.25, 0.5, 0.5)`
 
-# 图层几何学
+## 图层几何学
 - anchorPoint：图层的锚点  `layer.anchorPoint = CGPointMake(0.5f, 0.9f);`
 - `CALayer`在不同坐标系剑的转换
 
@@ -29,7 +29,7 @@ description: Core Animation
 - Z坐标轴：`zPosition`、`anchorPointZ`
 - Hit Testing：`-containsPoint:`【需要将坐标转成每个图层坐标系下的坐标】、`-hitTest:`【`CALayer *layer = [self.layerView.layer hitTest:point];`】
 
-# 视觉效果
+## 视觉效果
 - 圆角：`layer.cornerRadius = 20.0f;`
 - 图层边框：`layer.borderWidth = 5.0f;`    `layer.borderColor = [UIColor greenColor].CGColor;`
 - 阴影：`shadowOpacity`【在0.0（不可见）和1.0（完全不透明）之间的浮点数】、`shadowColor`、`shadowOffset`【控制阴影的方向和距离，是一个`CGSize`的值，宽度控制这阴影横向的位移，高度控制着纵向的位移】、`shadowRadius`【控制阴影的模糊度，当它的值是0的时候，阴影就和视图一样有一个非常确定的边界线。当值越来越大的时候，边界线看上去就会越来越模糊和自然】
@@ -39,8 +39,9 @@ description: Core Animation
 - 拉伸过滤：`minificationFilter`【缩小】、`magnificationFilter`【放大】{kCAFilterLinear（默认）、kCAFilterNearest、kCAFilterTrilinear}
 - 组透明：`shouldRasterize`实现组透明的效果，如果它被设置为YES，在应用透明度之前，图层及其子图层都会被整合成一个整体的图片。为了启用`shouldRasterize`属性，要设置图层的`rasterizationScale`属性。默认情况下，所有图层拉伸都是1.0， 所以如果使用了`shouldRasterize`属性，就要确保设置了`rasterizationScale`属性去匹配屏幕，以防止出现Retina屏幕像素化的问题。`layer.shouldRasterize = YES;    layer.rasterizationScale = [UIScreen mainScreen].scale;`
 
-# 变换
-## 仿射变换(`CGAffineTransform`)【平移、旋转、缩放、斜切】
+## 变换
+
+### 仿射变换(`CGAffineTransform`)【平移、旋转、缩放、斜切】
 `UIView`可以通过设置`transform`属性做变换，但实际上它只是封装了内部图层的变换。`CALayer`同样也有一个`transform`属性，但它的类型是`CATransform3D`，而不是`CGAffineTransform`，`CALayer`对应于`UIView`的`transform`属性叫做`affineTransform`。
 ![仿射变换.png](/assets/image/iOS-Core-Animation-Advanced-Techniques-仿射变换.png)
 
@@ -63,7 +64,7 @@ CGAffineTransformConcat(CGAffineTransform t1, CGAffineTransform t2);//在两个�
 
 - 斜切变换：不常用
 
-## 3D 变换
+### 3D 变换
 ![3D 变换](/assets/image/iOS-Core-Animation-Advanced-Techniques-3D变换.png)
 
 ```objc
@@ -78,9 +79,9 @@ CATransform3DMakeTranslation(Gloat tx, CGFloat ty, CGFloat tz)
 - 背面：图层是双面绘制的，反面显示的是正面的一个镜像图片。`doubleSided`的属性来控制图层的背面是否要被绘制
 
 
-# 专用图层
+## 专用图层
 
-## CAShapeLayer
+### CAShapeLayer
 `CAShapeLayer`是一个通过矢量图形来绘制的图层子类。可以指定诸如颜色和线宽等属性，用`CGPath`来定义想要绘制的图形，最后`CAShapeLayer`就自动渲染出来。
 
 ```objc
@@ -96,7 +97,7 @@ CATransform3DMakeTranslation(Gloat tx, CGFloat ty, CGFloat tz)
   [self.containerView.layer addSublayer:shapeLayer];
 ```
 
-### 圆角（单独指定矩形的每个角）
+- 圆角（单独指定矩形的每个角）
 
 ```objc
 //define path parameters
@@ -107,13 +108,14 @@ UIRectCorner corners = UIRectCornerTopRight | UIRectCornerBottomRight | UIRectCo
 UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorners:corners cornerRadii:radii];
 ```
 
-## CATextLayer
+### CATextLayer
 `Core Animation`提供了一个`CALayer`的子类`CATextLayer`，它以图层的形式包含了`UILabel`几乎所有的绘制特性，并且额外提供了一些新的特性。
 
 ```objc
 //create a text layer
   CATextLayer *textLayer = [CATextLayer layer];
   textLayer.frame = self.labelView.bounds;
+  textLayer.contentsScale = [UIScreen mainScreen].scale;// 适配 Retina
   [self.labelView.layer addSublayer:textLayer];
 
   //set text attributes
@@ -137,6 +139,38 @@ UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorn
   //set layer text
   textLayer.string = text;
 ```
+
+### CATransformLayer
+
+### CAGradientLayer
+`CAGradientLayer`是用来生成两种或更多颜色平滑渐变的。用`Core Graphics`复制一个`CAGradientLayer`并将内容绘制到一个普通图层的寄宿图也是有可能的，但是`CAGradientLayer`的真正好处在于绘制使用了硬件加速。
+
+```objc
+//create gradient layer and add it to our container view
+  CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+  gradientLayer.frame = self.containerView.bounds;
+  [self.containerView.layer addSublayer:gradientLayer];
+
+  //set gradient colors
+  gradientLayer.colors = @[(__bridge id)[UIColor redColor].CGColor, (__bridge id)[UIColor blueColor].CGColor];
+
+  //set gradient start and end points
+  gradientLayer.startPoint = CGPointMake(0, 0);
+  gradientLayer.endPoint = CGPointMake(1, 1);
+```
+
+`colors`属性可以包含很多颜色。默认情况下，这些颜色在空间上均匀地被渲染，但是可以用`locations`属性来调整空间。`locations`属性是一个浮点数值的数组（以NSNumber包装）。这些浮点数定义了`colors`属性中每个不同颜色的位置，同样的，也是以单位坐标系进行标定。0.0代表着渐变的开始，1.0代表着结束。
+`locations`数组并不是强制要求的，但是如果给它赋值了就一定要确保`locations`的数组大小和`colors`数组大小一定要相同，否则你将会得到一个空白的渐变。
+
+```objc
+//set gradient colors
+    gradientLayer.colors = @[(__bridge id)[UIColor redColor].CGColor, (__bridge id) [UIColor yellowColor].CGColor, (__bridge id)[UIColor greenColor].CGColor];
+
+    //set locations
+    gradientLayer.locations = @[@0.0, @0.25, @0.5];
+```
+
+
 
 
 
