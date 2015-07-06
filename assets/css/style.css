@@ -928,7 +928,7 @@ pre {
   font: .9em/1.5 Consolas, Monaco, 'Andale Mono', monospace;
   border: 1px solid #e5e8ec;
   border-radius: 3px;
-  background-color: #fdfdfd;
+  background-color: #e2eefa;
   background-image: -webkit-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
   background-image: -moz-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
   background-image: -ms-linear-gradient(transparent 50%, rgba(69, 142, 209, 0.04) 50%);
