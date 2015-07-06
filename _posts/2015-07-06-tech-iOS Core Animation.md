@@ -86,15 +86,15 @@ CATransform3DMakeTranslation(Gloat tx, CGFloat ty, CGFloat tz)
 
 ```objc
 //create shape layer
-  CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-  shapeLayer.strokeColor = [UIColor redColor].CGColor;
-  shapeLayer.fillColor = [UIColor clearColor].CGColor;
-  shapeLayer.lineWidth = 5;
-  shapeLayer.lineJoin = kCALineJoinRound;
-  shapeLayer.lineCap = kCALineCapRound;
-  shapeLayer.path = path.CGPath;
-  //add it to our view
-  [self.containerView.layer addSublayer:shapeLayer];
+CAShapeLayer *shapeLayer = [CAShapeLayer layer];
+shapeLayer.strokeColor = [UIColor redColor].CGColor;
+shapeLayer.fillColor = [UIColor clearColor].CGColor;
+shapeLayer.lineWidth = 5;
+shapeLayer.lineJoin = kCALineJoinRound;
+shapeLayer.lineCap = kCALineCapRound;
+shapeLayer.path = path.CGPath;
+//add it to our view
+[self.containerView.layer addSublayer:shapeLayer];
 ```
 
 - 圆角（单独指定矩形的每个角）
@@ -113,31 +113,31 @@ UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorn
 
 ```objc
 //create a text layer
-  CATextLayer *textLayer = [CATextLayer layer];
-  textLayer.frame = self.labelView.bounds;
-  textLayer.contentsScale = [UIScreen mainScreen].scale;// 适配 Retina
-  [self.labelView.layer addSublayer:textLayer];
+CATextLayer *textLayer = [CATextLayer layer];
+textLayer.frame = self.labelView.bounds;
+textLayer.contentsScale = [UIScreen mainScreen].scale;// 适配 Retina
+[self.labelView.layer addSublayer:textLayer];
 
-  //set text attributes
-  textLayer.foregroundColor = [UIColor blackColor].CGColor;
-  textLayer.alignmentMode = kCAAlignmentJustified;
-  textLayer.wrapped = YES;
+//set text attributes
+textLayer.foregroundColor = [UIColor blackColor].CGColor;
+textLayer.alignmentMode = kCAAlignmentJustified;
+textLayer.wrapped = YES;
 
-  //choose a font
-  UIFont *font = [UIFont systemFontOfSize:15];
+//choose a font
+UIFont *font = [UIFont systemFontOfSize:15];
 
-  //set layer font
-  CFStringRef fontName = (__bridge CFStringRef)font.fontName;
-  CGFontRef fontRef = CGFontCreateWithFontName(fontName);
-  textLayer.font = fontRef;
-  textLayer.fontSize = font.pointSize;
-  CGFontRelease(fontRef);
+//set layer font
+CFStringRef fontName = (__bridge CFStringRef)font.fontName;
+CGFontRef fontRef = CGFontCreateWithFontName(fontName);
+textLayer.font = fontRef;
+textLayer.fontSize = font.pointSize;
+CGFontRelease(fontRef);
 
-  //choose some text
-  NSString *text = @"Lorem ipsum dolor sit amet, consectetur adipiscing \ elit. Quisque massa arcu, eleifend vel varius in, facilisis pulvinar \ leo. Nunc quis nunc at mauris pharetra condimentum ut ac neque. Nunc elementum, libero ut porttitor dictum, diam odio congue lacus, vel \ fringilla sapien diam at purus. Etiam suscipit pretium nunc sit amet \ lobortis";
+//choose some text
+NSString *text = @"Lorem ipsum dolor sit amet, consectetur adipiscing \ elit. Quisque massa arcu, eleifend vel varius in, facilisis pulvinar \ leo. Nunc quis nunc at mauris pharetra condimentum ut ac neque. Nunc elementum, libero ut porttitor dictum, diam odio congue lacus, vel \ fringilla sapien diam at purus. Etiam suscipit pretium nunc sit amet \ lobortis";
 
-  //set layer text
-  textLayer.string = text;
+//set layer text
+textLayer.string = text;
 ```
 
 ### CATransformLayer
@@ -147,16 +147,16 @@ UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorn
 
 ```objc
 //create gradient layer and add it to our container view
-  CAGradientLayer *gradientLayer = [CAGradientLayer layer];
-  gradientLayer.frame = self.containerView.bounds;
-  [self.containerView.layer addSublayer:gradientLayer];
+CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+gradientLayer.frame = self.containerView.bounds;
+[self.containerView.layer addSublayer:gradientLayer];
 
-  //set gradient colors
-  gradientLayer.colors = @[(__bridge id)[UIColor redColor].CGColor, (__bridge id)[UIColor blueColor].CGColor];
+//set gradient colors
+gradientLayer.colors = @[(__bridge id)[UIColor redColor].CGColor, (__bridge id)[UIColor blueColor].CGColor];
 
-  //set gradient start and end points
-  gradientLayer.startPoint = CGPointMake(0, 0);
-  gradientLayer.endPoint = CGPointMake(1, 1);
+//set gradient start and end points
+gradientLayer.startPoint = CGPointMake(0, 0);
+gradientLayer.endPoint = CGPointMake(1, 1);
 ```
 
 `colors`属性可以包含很多颜色。默认情况下，这些颜色在空间上均匀地被渲染，但是可以用`locations`属性来调整空间。`locations`属性是一个浮点数值的数组（以NSNumber包装）。这些浮点数定义了`colors`属性中每个不同颜色的位置，同样的，也是以单位坐标系进行标定。0.0代表着渐变的开始，1.0代表着结束。
@@ -169,6 +169,54 @@ UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorn
     //set locations
     gradientLayer.locations = @[@0.0, @0.25, @0.5];
 ```
+
+### CAReplicatorLayer
+
+### CAScrollLayer
+`CAScrollLayer`有一个-`scrollToPoint:`方法，它自动适应`bounds`的原点以便图层内容出现在滑动的地方。注意，这就是它做的所有事情。前面提到过，`Core Animation`并不处理用户输入，所以`CAScrollLayer`并不负责将触摸事件转换为滑动事件，既不渲染滚动条，也不实现任何iOS指定行为例如滑动反弹。
+
+```objc
+//get the offset by subtracting the pan gesture
+//translation from the current bounds origin
+CGPoint offset = self.bounds.origin;
+offset.x -= [recognizer translationInView:self].x;
+offset.y -= [recognizer translationInView:self].y;
+
+//scroll the layer
+[(CAScrollLayer *)self.layer scrollToPoint:offset];
+
+//reset the pan gesture translation
+[recognizer setTranslation:CGPointZero inView:self];
+```
+
+### CATiledLayer
+
+### CAEmitterLayer
+是一个高性能的粒子引擎，被用来创建实时例子动画如：烟雾，火，雨等等这些效果。
+
+### CAEAGLLayer
+
+### AVPlayerLayer
+是由`AVFoundation`提供的，它和`Core Animation`紧密地结合在一起，提供了一个`CALayer`子类来显示自定义的内容类型。
+
+`AVPlayerLayer`是用来在iOS上播放视频的。是高级接口例如`MPMoivePlayer`的底层实现，提供了显示视频的底层控制。`AVPlayerLayer`的使用相当简单：可以用`+playerLayerWithPlayer:`方法创建一个已经绑定了视频播放器的图层，或者可以先创建一个图层，然后用`player`属性绑定一个`AVPlayer实例`。
+
+```objc
+//get video URL
+NSURL *URL = [[NSBundle mainBundle] URLForResource:@"Ship" withExtension:@"mp4"];
+
+//create player and player layer
+AVPlayer *player = [AVPlayer playerWithURL:URL];
+AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
+
+//set player layer frame and attach it to our view
+playerLayer.frame = self.containerView.bounds;
+[self.containerView.layer addSublayer:playerLayer];
+
+//play the video
+[player play];
+```
+
 
 
 
