@@ -98,13 +98,12 @@ POPBasicAnimation *basicAnimation = [POPBasicAnimation animation];
 POPBasicAnimation *basicAnimation = [POPBasicAnimation animation];
 ```
 
-**Note**: Works on any Layer property or any object that inherits from UIView such as `UIToolbar` | `UIPickerView` | `UIDatePicker` | `UIScrollView` |  `UITextView` | `UIImageView` | `UITableViewCell` | `UIStepper` | `UIProgressView` | `UIActivityIndicatorView` | `UISwitch` | `UISlider` | `UITextField` | `UISegmentedControl` | `UIButton` | `UIView` | `UITableView`
+**Note**: Works on any Layer property or any object that inherits from UIView such as `UIToolbar` 、 `UIPickerView` 、 `UIDatePicker` 、 `UIScrollView` 、  `UITextView` 、 `UIImageView` 、 `UITableViewCell` 、 `UIStepper` 、 `UIProgressView` 、 `UIActivityIndicatorView` 、 `UISwitch` 、 `UISlider` 、 `UITextField` 、 `UISegmentedControl` 、 `UIButton` 、 `UIView` 、 `UITableView`
 
 
 ## Step 3 Find your property below then add and set .toValue
 
 ### View Properties
-
 
 ##### Alpha - kPOPViewAlpha
 ```objc
@@ -221,8 +220,10 @@ basicAnimation.property = [POPAnimatableProperty propertyWithName: kPOPLayerRota
 basicAnimation.toValue= @(M_PI/4); //2 M_PI is an entire rotation
 ```
 
-#### Note: Property Changes work for all 3 animation types - POPBasicAnimation POPSpringAnimation POPDecayAnimation
+**Note**: Property Changes work for all 3 animation types - POPBasicAnimation POPSpringAnimation POPDecayAnimation
+
 ### Example
+
 ```objc
 POPSpringAnimation *basicAnimation = [POPSpringAnimation animation];
 basicAnimation.property = [POPAnimatableProperty propertyWithName: kPOPLayerRotation];
@@ -235,7 +236,7 @@ basicAnimation.name=@"WhatEverAnimationNameYouWant";
 basicAnimation.delegate=self;
 ```
 
-##### Declare Delegate Protocol `<POPAnimatorDelegate>`
+Declare Delegate Protocol `<POPAnimatorDelegate>`
 
 ### Delegate Methods
 
