@@ -12,7 +12,7 @@ description: 介绍如何使用 Python 来写爬虫
 采用上一篇介绍的方法来抓取网易云音乐的 mp3，第一步还是通过**Burp Suite**来进行嗅探，发现其真正有用的 request，进行尝试：
 
 
-    {% highlight Python %}
+    ```objc
     # 抓取网易云音乐
     import requests
 
@@ -21,7 +21,7 @@ description: 介绍如何使用 Python 来写爬虫
     r = requests.get(url = url)
     print(r.text)
 
-    {% endhighlight %}
+    ```
 
 发现后台输出结果为：`{"message":"illegal request!","code":403}`。
 这说明网易云音乐的反爬虫做的比荔枝 FM 要好，它识别出这次请求不是正常用户访问行为。
@@ -30,7 +30,7 @@ description: 介绍如何使用 Python 来写爬虫
 上代码：
 
 
-    {% highlight Python %}
+    ```python
     # 添加头信息
     import requests
 
@@ -51,12 +51,12 @@ description: 介绍如何使用 Python 来写爬虫
     r = requests.get(url = url,headers = headers)
     print(r.text.encode('utf8'))
 
-    {% endhighlight %}
+    ```
 
 运行查看控制台输出可以发现有结果了，接下来就是获取 mp3的 url 了。
 
 
-    {% highlight Python%}
+    ```python```
     # 完整代码
     import requests
     import json
@@ -87,7 +87,7 @@ description: 介绍如何使用 Python 来写爬虫
 
     file_to_save.close()
 
-    {% endhighlight %}
+    ```
 
 最后介绍一个小技巧用于调试：
 
