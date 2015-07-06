@@ -11,7 +11,7 @@ description: Facebook Pop Tutorial
 转载[https://github.com/maxmyers/FacebookPop/blob/master/README.md](https://github.com/maxmyers/FacebookPop/blob/master/README.md)
 
 
-#5 Steps For Using Facebook Pop#
+# 5 Steps For Using Facebook Pop
 
 ```objc
   // 1. Pick a Kind Of Animation 
@@ -39,7 +39,6 @@ description: Facebook Pop Tutorial
 
 
 ## Step 1 Pick Kind of Animation
-
 
 ### POPBasicAnimation
 ```objc
@@ -71,38 +70,42 @@ POPBasicAnimation *basicAnimation = [POPBasicAnimation animation];
 ## Step 2 Decide if you will animate a view property or layer property
 
 ### View Properties
-##### Alpha - kPOPViewAlpha
-##### Color - kPOPViewBackgroundColor
-##### Size - kPOPViewBounds
-##### Center - kPOPViewCenter
-##### Location & Size - kPOPViewFrame
-##### Size - kPOPViewScaleXY
-##### Size(Scale) - kPOPViewSize
+
+- Alpha - kPOPViewAlpha
+- Color - kPOPViewBackgroundColor
+- Size - kPOPViewBounds
+- Center - kPOPViewCenter
+- Location & Size - kPOPViewFrame
+- Size - kPOPViewScaleXY
+- Size(Scale) - kPOPViewSize
 
 
 ### Layer Properties
-##### Color - kPOPLayerBackgroundColor
-##### Size - kPOPLayerBounds
-##### Size - kPOPLayerScaleXY
-##### Size - kPOPLayerSize
-##### Opacity - kPOPLayerOpacity
-##### Position - kPOPLayerPosition
-##### X Position - kPOPLayerPositionX
-##### Y Position - kPOPLayerPositionY
-##### Rotation - kPOPLayerRotation
-##### Color - kPOPLayerBackgroundColor
+
+- Color - kPOPLayerBackgroundColor
+- Size - kPOPLayerBounds
+- Size - kPOPLayerScaleXY
+- Size - kPOPLayerSize
+- Opacity - kPOPLayerOpacity
+- Position - kPOPLayerPosition
+- X Position - kPOPLayerPositionX
+- Y Position - kPOPLayerPositionY
+- Rotation - kPOPLayerRotation
+- Color - kPOPLayerBackgroundColor
 
 ### Example
 ```objc
 POPBasicAnimation *basicAnimation = [POPBasicAnimation animation];
 ```
 
-#### Note: Works on any Layer property or any object that inherits from UIView such as UIToolbar | UIPickerView | UIDatePicker | UIScrollView |  UITextView | UIImageView | UITableViewCell | UIStepper | UIProgressView | UIActivityIndicatorView | UISwitch | UISlider | UITextField | UISegmentedControl | UIButton | UIView | UITableView
+**Note**: Works on any Layer property or any object that inherits from UIView such as `UIToolbar` | `UIPickerView` | `UIDatePicker` | `UIScrollView` |  `UITextView` | `UIImageView` | `UITableViewCell` | `UIStepper` | `UIProgressView` | `UIActivityIndicatorView` | `UISwitch` | `UISlider` | `UITextField` | `UISegmentedControl` | `UIButton` | `UIView` | `UITableView`
 
 
 ## Step 3 Find your property below then add and set .toValue
 
 ### View Properties
+
+
 ##### Alpha - kPOPViewAlpha
 ```objc
 POPBasicAnimation *basicAnimation = [POPBasicAnimation animation];
@@ -153,6 +156,8 @@ basicAnimation.toValue=[NSValue valueWithCGSize:CGSizeMake(30, 200)];
 ```
 
 ### Layer Properties
+
+
 ##### Color - kPOPLayerBackgroundColor
 ```objc
 POPSpringAnimation *basicAnimation = [POPSpringAnimation animation];
@@ -233,9 +238,8 @@ basicAnimation.delegate=self;
 ##### Declare Delegate Protocol `<POPAnimatorDelegate>`
 
 ### Delegate Methods
-`
-<POPAnimatorDelegate>
-`
+
+`<POPAnimatorDelegate>`
 
 ```objc
 - (void)pop_animationDidStart:(POPAnimation *)anim;
@@ -251,6 +255,7 @@ basicAnimation.delegate=self;
 
 
 ### Example
+
 ```objc
 POPSpringAnimation *basicAnimation = [POPSpringAnimation animation];
 basicAnimation.property = [POPAnimatableProperty propertyWithName:kPOPViewFrame];
@@ -260,9 +265,11 @@ basicAnimation.delegate=self;
 ```
 
 ## Step 5 Add animation to View
+
 ```objc
  [self.tableView pop_addAnimation:basicAnimation forKey:@"WhatEverNameYouWant"];
 ```
+
 ### Example
 ```objc
   POPSpringAnimation *basicAnimation = [POPSpringAnimation animation];
