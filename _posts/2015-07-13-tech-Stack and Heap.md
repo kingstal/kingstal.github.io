@@ -12,7 +12,7 @@ description: Stack, Heap
 stack 是存储`local variables`和`temporary values`的内存区域。每个线程运行时对应一个stack。当函数被调用，一个`stack frame`被 push 进 stack，函数的本地数据在那保存。当函数结束时，`stack frame`被销毁。所有的过程都是自动的。
 
 ## Heap
-The heap is what you access when you call malloc and free.
+`The heap is what you access when you call malloc and free.`
 heap 能随时被 alloc 和销毁。全局和静态变量保存在heap中，直到应用退出。为了访问创建在heap 中的数据，最少要求有一个保存在stack中的指针，因为CPU通过stack中的指针访问heap中的数据。
 
 可以认为stack 中的一个指针仅仅是一个整型变量，保存了heap 中特定内存地址的数据。实际上，它有一点点复杂，但这是它的基本结构。
