@@ -147,3 +147,84 @@ assert(age >= 0, "A person's age cannot be less than zero")
 - 区间运算符
 闭区间运算符（`a...b`）定义一个包含从`a`到`b`(包括`a`和`b`)的所有值的区间，`b`必须大于`a`。
 半开区间（`a..<b`）定义一个从`a`到`b`但不包括`b`的区间。
+
+### 字符串和字符
+- 字符串索引 (String Indices)
+每一个字符串都有一个关联的索引(*index*)类型，`String.index`，它对应着字符串中的每一个字符的位置。
+前面提到，不同的字符可能会占用不同的内存空间数量，所以要知道字符的确定位置，就必须从字符串开头遍历每一个 Unicode 标量到字符串结尾。因此，Swift 的字符串不能用整数(integer)做索引。
+使用`startIndex`属性可以获取字符串的第一个字符。使用`endIndex`属性可以获取最后一个字符的末尾位置。如果字符串是空值，`startIndex`和`endIndex`是相等的。
+通过调用`String.Index`的`predecessor()`方法，可以立即得到前面一个索引，调用`successor()`方法可以立即得到后面一个索引。任何一个字符串的索引都可以通过锁链作用的这些方法来获取另一个索引，也可以调用`advance(start:n:)`函数来获取。
+
+```swift
+let greeting = "Guten Tag"
+greeting[greeting.startIndex]
+// G
+greeting[greeting.endIndex.predecessor()]
+// g
+greeting[greeting.startIndex.successor()]
+// u
+let index = advance(greeting.startIndex, 7)
+greeting[index]
+// a
+greeting[greeting.endIndex] // 错误
+greeting.endIndex.successor() // 错误
+```
+
+使用`characters`属性的`indices`会创建一个包含全部索引的范围(`Range`)，用来在一个字符串中访问分立的字符。
+
+```swift
+for index in greeting.characters.indices {
+    print("\(greeting[index]) ", appendNewline: false)
+}
+// 打印输出 "G u t e n   T a g !"
+```
+
+- 插入和删除 (Inserting and Removing)
+调用`insert(_:atIndex:)`方法可以在一个字符串的指定索引插入一个字符。
+
+```swift
+var welcome = "hello"
+welcome.insert("!", atIndex: welcome.endIndex)
+// welcome now 现在等于 "hello!"
+```
+
+调用`splice(_:atIndex:)`方法可以在一个字符串的指定索引插入一个字符串。
+
+```swift
+welcome.splice(" there".characters, atIndex: welcome.endIndex.predecessor())
+// welcome 现在等于 "hello there!"
+```
+
+调用`removeAtIndex(_:)`方法可以在一个字符串的指定索引删除一个字符。
+
+```swift
+welcome.removeAtIndex(welcome.endIndex.predecessor())
+// welcome 现在等于 "hello there"
+// 翻译的人解释：最后还有一个换行符，所以这里删除的是 !
+```
+
+调用`removeRange(_:)`方法可以在一个字符串的指定索引删除一个子字符串。
+
+```swift
+let range = advance(welcome.endIndex, -6)..<welcome.endIndex
+welcome.removeRange(range)
+// welcome 现在等于 "hello"
+```
+
+- 比较字符串 (Comparing Strings)
+
+```swift
+// 字符串/字符相等
+if quotation == sameQuotation {
+    print("These two strings are considered equal")
+}
+
+// 前缀/后缀相等 (Prefix and Suffix Equality)
+for scene in romeoAndJuliet {
+    if scene.hasPrefix("Act 1 ") {
+        ++act1SceneCount
+    }
+}
+
+
+```
