@@ -6,8 +6,15 @@
 
 
 `NSOperation`
-表示了一个独立的计算单元。作为一个抽象类，它给了它的子类一个十分有用而且线程安全的方式来建立状态、优先级、依赖性和取消等的模型。框架还提供`NSBlockOperation`和`NSInvocationOperation，是继承自NSOperation的实体类。
+表示了一个独立的计算单元。作为一个抽象类，它给了它的子类一个十分有用而且线程安全的方式来建立状态、优先级、依赖性和取消等的模型。框架还提供`NSBlockOperation`和`NSInvocationOperation`，是继承自NSOperation的实体类。
 
+- 使用：
+
+1. 使用提供的`NSBlockOperation`和`NSInvocationOperation`创建任务
+2. 将任务添加到队列中
+3. 任务间可以添加依赖，是跨队列的（`[intermediateOperation addDependency:operation1];`）、队列可以设置任务都并发数
+
+----------------------------
 可以通过重写 `main` 或者 `start` 方法 来定义自己的 `operations` 。前一种方法非常简单，开发者不需要管理一些状态属性（例如 `isExecuting` 和 `isFinished`），当 `main` 方法返回的时候，这个 operation 就结束了。这种方式使用起来非常简单，但是灵活性相对重写 `start` 来说要少一些。
 
     {% highlight objective-c %}
