@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Objective-C Runtime
+title: Objective-C Runtime 特性1：基本概念
 category: 技术
 tags: Objective-C Runtime
 keywords: Objective-C Runtime
@@ -267,6 +267,8 @@ for (i = 0 ; i < 1000 ; i++)
 
 当然这种方式只适合于在类似于for循环这种情况下频繁调用同一方法，以提高性能的情况。另外，methodForSelector:是由Cocoa运行时提供的；它不是Objective-C语言的特性。
 
+----------------------------------------
+
 ### 消息转发(message forwarding)
 
 在 Objective-C 中，[object foo] 语法并不会立即执行 foo 这个方法的代码。它是在运行时给 object 发送一条叫 foo 的消息。
@@ -364,17 +366,10 @@ Objective-C 中给一个对象发送消息会经过以下几个步骤：
 4. 如果没有新的目标对象返回， Runtime 就会发送 `-methodSignatureForSelector:` 和 `-forwardInvocation:` 消息。你可以发送 `-invokeWithTarget:` 消息来手动转发消息或者发送 `-doesNotRecognizeSelector:` 抛出异常。
 
 
-
-
-
-
-
-
-
 ### 参考
 [http://tech.glowing.com/cn/objective-c-runtime/](http://tech.glowing.com/cn/objective-c-runtime/)
 
-[Objective-C Runtime系列][http://southpeak.github.io/blog/2014/10/25/objective-c-runtime-yun-xing-shi-zhi-lei-yu-dui-xiang/]
+[Objective-C Runtime系列](http://southpeak.github.io/blog/2014/10/25/objective-c-runtime-yun-xing-shi-zhi-lei-yu-dui-xiang/)
 
 
 
