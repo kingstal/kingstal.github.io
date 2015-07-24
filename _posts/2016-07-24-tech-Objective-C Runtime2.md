@@ -98,6 +98,42 @@ struct objc_method {
 理解这几个术语之间的关系最好的方式是：一个类维护一个运行时可接收的消息分发表`objc_method_list；分发表中的每个入口是一个方法(Method)，其中key是一个特定名称，即选择器(SEL)，其对应一个实现(IMP)，即指向底层C函数的指针。
 
 
+### Aspect Oriented Programming （面向切面编程）
+
+> An aspect can alter the behavior of the base code by applying advice (additional behavior) at various join points (points in a program) specified in a quantification or query called a pointcut (that detects whether a given join point matches).
+
+在 Objective-C 中，这句话意思就是利用 Runtime 特性给指定的方法添加自定义代码。有很多方式可以实现 AOP ，Method Swizzling 就是其中之一。而且幸运的是，目前已经有一些第三方库可以让你不需要了解 Runtime ，就能直接开始使用 AOP 。
+
+[Aspects](https://github.com/steipete/Aspects) 就是一个不错的 AOP 库，封装了 Runtime ， Method Swizzling 这些黑色技巧，只提供两个简单的API：
+
+```objc
+/// Adds a block of code before/instead/after the current `selector` for a specific class.
+///
+/// @param block Aspects replicates the type signature of the method being hooked.
+/// The first parameter will be `id<AspectInfo>`, followed by all parameters of the method.
+/// These parameters are optional and will be filled to match the block signature.
+/// You can even use an empty block, or one that simple gets `id<AspectInfo>`.
+///
+/// @note Hooking static methods is not supported.
+/// @return A token which allows to later deregister the aspect.
++ (id<AspectToken>)aspect_hookSelector:(SEL)selector
+                      withOptions:(AspectOptions)options
+                       usingBlock:(id)block
+                            error:(NSError **)error;
+
+/// Adds a block of code before/instead/after the current `selector` for a specific instance.
+- (id<AspectToken>)aspect_hookSelector:(SEL)selector
+                      withOptions:(AspectOptions)options
+                       usingBlock:(id)block
+                            error:(NSError **)error;
+
+/// Deregister an aspect.
+/// @return YES if deregistration is successful, otherwise NO.
+id<AspectToken> aspect = ...;
+[aspect remove];
+```
+
+
 
 ### 参考
 [http://southpeak.github.io/blog/2014/11/06/objective-c-runtime-yun-xing-shi-zhi-si-:method-swizzling/](http://southpeak.github.io/blog/2014/11/06/objective-c-runtime-yun-xing-shi-zhi-si-:method-swizzling/)
