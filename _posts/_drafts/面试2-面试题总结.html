@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+
+    <article id="post-iOS面试题总结与感想" class="article article-type-post" itemscope itemprop="blogPost">
+        <div class="article-entry" itemprop="articleBody">
+            <ol>
+                <li><code>@property</code>中的assign,retain,copy,nonatomic的意思分别是什么? (解释略…你懂的)</li>
+                <li><code>weak</code>和<code>assign</code>的区别,<code>strong</code>和<code>retain</code>的区别,<code>copy</code>和<code>retain</code>的区别?<br><code>assign</code>适用于非对象类型,<code>weak</code>弱引用在引用计数为0的时候会将对象置为nil.<br>其实从这个也可以引申到内存管理的一系列问题.面试官会让你讲讲<code>MRC</code>和<code>ARC</code>的理解,随即也引申出<code>Block</code>的内存机制,为啥推荐<code>Block</code>用<code>copy</code>,<code>Block</code>会存在哪些内存问题?循环引用?<br>推荐一个文章,讲的蛮不错的,里面也有对<code>Block</code>的链接引用-&gt;<a href="http://www.cocoachina.com/ios/20150206/11121.html#0-qzone-1-7097-d020d2d2a4e8d1a374a433f596ad1440" target="_blank" rel="external">传送门,请点击我</a></li>
+                <li>依旧是内存管理,<code>release</code>和<code>autorelease</code>的含义?这里尤其要强调下<code>autorelease</code>,它引申出<code>自动释放池</code>,也能引申出<code>Run loop</code>!<br>参考下这两个链接:<a href="http://blog.csdn.net/yanfangjin/article/details/7545673" target="_blank" rel="external">参考1号</a>@<a href="http://stackoverflow.com/questions/5766839/end-of-run-loop-autorelease-pool-recovery" target="_blank" rel="external">参考2号</a>(<font color="red">PS:有的链接可能需要翻墙,但是作为一个开发人员来说,    拥有VPN进行google还是必备的吧!</font>)</li>
+                <li>OC语言的动态性指什么?有没有了解过<code>objective-c runtime</code>的相关问题?它包括那些含义?<br>依旧给出一些不错的文章链接:<a href="http://southpeak.github.io/blog/2014/10/25/objective-c-runtime-yun-xing-shi-zhi-lei-yu-dui-xiang/" target="_blank" rel="external">Number1</a>@<a href="http://blog.codingcoder.com/dig-into-objc/" target="_blank" rel="external">Number2</a>@<a href="http://chun.tips/" target="_blank" rel="external">Number3</a></li>
+                <li>使用过<code>Core Graphic</code> <code>Core Animation</code> <code>Quartz Core</code>等常用框架吗?在什么条件下会用到?能够实现什么功能?一般这种问题,都是涉及到你自定义UI控件的能力,以及能够实现炫丽动画效果的能力.(含义很广,大家自行找资料,还是推荐个0.0-&gt;<a href="http://zsisme.gitbooks.io/ios-/content/index.html" target="_blank" rel="external">讲Core Animation的</a>)</li>
+                <li>iOS中多线程有哪几种?各自之间有什么区别?这个问题,毋庸置疑,必问!!!<br><code>NSThread</code>:貌似基本没到过…囧….可以去了解下….<br><code>NSOperation</code>:据说是用在处理复杂的情况下…经常被问到与<code>GCD</code>的不同,LZ略纠结每次都不知道怎么回答,只能说一个处理复杂情况一个处理简单情况…也没用到过…不过你研究下<code>AFNetworking</code>的源码,可以发现,它的核心类是继承<code>NSOperation</code>的…<br><code>GCD</code>:常用…这个可以看看我的博客,里面很多它的介绍! <a href="http://blog.csdn.net/hmt20130412/article/category/2206439" target="_blank" rel="external">点这里</a></li>
+                <li>数据存储这一块,你常用哪一种?什么是<code>序列化</code>?<code>sqlite</code>是直接用它还是用封装了它的第三方库?<code>sqlite</code>和<code>core data</code>的区别?<br>LZ碰到的基本都是问<code>sqlite</code>和<code>core data</code>的区别…从什么方面来决定一个项目采用哪种方式来做存储…个人觉得没有必要区分谁好谁坏…都去了解掌握肯定是有好处的…网上有很多讲两个之间的区别,但是就算你知道区别,如果两个都用不好也是白搭.唯有一解-&gt;<code>学!学!学</code><a id="more"></a></li>
+                <li><code>代理</code>和<code>通知</code>…分别在什么情况下使用?区别?各自优点?(略,略,略,自行谷歌)</li>
+                <li>你经常使用一些第三方库吗?比如<code>AFNetworking</code> <code>SDWebimage</code> <code>JsonModel</code>等,有没有去了解过里面的实现原理?<br>强烈推荐大家,最好都去看看源代码,不要<code>只知其而不知其所以然</code>,能够学习到很多知识.也算是一次整体知识架构的温习,也能学习到一些优秀库的设计模式等.</li>
+                <li><code>KVC</code>和<code>KVO</code>是什么?</li>
+                <li>是否了解<code>Socket网络编程</code>?是否明白<code>TCP/IP</code> <code>HTTP</code> <code>UDP</code>等协议知识?<br><a href="http://blog.sina.com.cn/s/blog_8dabcad30101ozhg.html" target="_blank" rel="external">参考1号</a>@<a href="http://www.cnblogs.com/li0803/archive/2008/11/03/1324746.html" target="_blank" rel="external">参考2号</a>…很多,自己去找吧</li>
+                <li>你知道哪些<code>设计模式</code>?实际项目中运用到了吗?(LZ我只回答了,<code>单例-策略-观察者-工厂-代理</code>(其实我觉得代理不能算进去))</li>
+                <li><code>MVC</code>是什么?你能画出它们之间的关系图吗?(对的,画图)</li>
+                <li>你的<code>C++</code>如何?<code>算法和数据结构</code>呢?(这个都是泪呀)-&gt;依旧是补!补!补!</li>
+                <li><code>Autolayout</code>的理解…使用的怎么样?<a href="http://www.hmttommy.com/2014/12/05/AutoLayout/" target="_blank" rel="external">可以看看我的这篇…虽然没详细讲Autolayout</a>…大家可以多搜搜…这就是涉及到你写代码是<code>纯代码</code>还是<code>storyboard</code>了…建立两种都必须掌握.</li>
+                <li>有没有学习<code>Swift</code>?这个,LZ建议,毕竟苹果给你开发的框架库没变,可以拿它写写Demo保持认识度,要不然,你只看不写,过一段时间又把它忘记了,就白看了…亲身体会…起码我现在能用<code>swift</code>来写写一些Demo就用它来写写….工作肯定还是用OC啦,不过也有的公司说已经完全用<code>swift</code>来开发了,只能说,毕竟还只是很少数的…</li>
+            </ol>
+        </div>
+</article>
+
+</body>
+</html>

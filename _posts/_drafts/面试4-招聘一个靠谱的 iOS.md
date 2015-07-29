@@ -83,9 +83,7 @@ Category的使用场景：
 
 - runtime如何实现weak变量的自动置nil？
 
-> 1. 没有研究过,你有研究过吗,可以给我讲讲吗?
-2. 我猜系统会维护一个弱指针列表,当某个对象销毁时候,它会把所有指向该对象的弱指针设置为nil
-【runtime会调用这两个方法，`objc_initWeak(&obj1,obj);objc_destoryWeak(&obj1);`】
+> runtime 对注册的类， 会进行布局，对于 weak 对象会放入一个 hash 表中。 用 weak 指向的对象地址作为 key，当此对象的引用计数为0的时候会 dealloc， 进而在这个 weak 表中找到次对象地址为键的所有 weak 对象，从而设置为 nil
 
 2.weak属性需要在dealloc中置nil么？
 
@@ -105,7 +103,7 @@ Category的使用场景：
 
 5.用@property声明的NSString（或NSArray，NSDictionary）经常使用copy关键字，为什么？如果改用strong关键字，可能造成什么问题？
 > 1. 因为父类指针可以指向子类对象,使用copy的目的是为了让本对象的属性不受外界影响,使用copy无论给我传入是一个可变对象还是不可变对象,本身持有的就是一个不可变的副本.
-3. 如果我们使用是strong,那么这个属性就有可能指向一个可变对象,如果这个可变对象在外部被修改了,那么会影响该属性.
+2. 如果我们使用是strong,那么这个属性就有可能指向一个可变对象,如果这个可变对象在外部被修改了,那么会影响该属性.
 
 6.@synthesize合成实例变量的规则是什么？假如property名为foo，存在一个名为_foo的实例变量，那么还会自动合成新变量么？
 > 如果没有指定成员变量的名称则自动生成一个属性同名的成员变量,如果指定成员变量的名称,会生成一个指定的名称的成员变量,如果这个成员已经存在了就不再生成了.
@@ -184,7 +182,8 @@ Category的使用场景：
 > 没有研究过,从名字来看是用来转发消息的,你能给我讲讲吗?谢谢!
 
 18.能否向编译后得到的类中增加实例变量？能否向运行时创建的类中添加实例变量？为什么？
-> 没有这么用过,运行中好像有添加属性方法. 你对这一块有很深了解吗,能给我讲讲吗.
+> 因为编译后的类已经注册在 runtime 中，类结构体中的 objc_ivar_list 实例变量的链表 和 instance_size 实例变量的内存大小已经确定，同时runtime 会调用 class_setIvarLayout 或 class_setWeakIvarLayout 来处理 strong weak 引用。所以不能向存在的类中添加实例变量，
+ 运行时创建的类是可以添加实例变量，调用 class_addIvar 函数。但是得在调用 objc_allocateClassPair 之后，objc_registerClassPair 之前，原因同上。
 
 19.runloop和线程有什么关系？
 >1. 每一个线程中都一个runloop,只有主线的的runloop默认是开启的,其他线程的runloop是默认没有开启的
@@ -194,7 +193,7 @@ Category的使用场景：
 20.runloop的mode作用是什么？
 
 以`+ scheduledTimerWithTimeInterval...`的方式触发的timer，在滑动页面上的列表时，timer会暂定回调，为什么？如何解决？
-> model 主要是用来指定时间在运行循环中的优先级的,苹果公开提供的 Mode 有两个：`kCFRunLoopDefaultMode` `kCFRunLoopCommonModes`.
+> mode 主要是用来指定时间在运行循环中的优先级的,苹果公开提供的 Mode 有两个：`kCFRunLoopDefaultMode` `kCFRunLoopCommonModes`.
 
 > 如果我们把一个NSTimer对象以kCFRunLoopDefaultMode添加到主运行循环中的时候,当一直有用户事件处理的时候,NSTimer将不再被调度;如果我们把一个NSTimer对象以kCFRunLoopCommonModes添加到主运行循环中的时候,当一直有用户事件处理的时候,NSTimer还能正常的调度,互不影响.
 
@@ -202,6 +201,15 @@ Category的使用场景：
 > 1. 是一个死循环
   2. 如果事件队列中存放在事件,那就取出事件,执行相关代码
   3. 如果没有事件,就挂起,等有事件了,立即唤醒事件循环,开始执行.
+ runloop 本质上就是 event loop 的实现。
+ 简单来说。。。
+ function loop() {
+ initialize();
+ do {
+ var message = get_next_message();
+ process_message(message);
+ } while (message != quit);
+ }
 
 22.objc使用什么机制管理对象内存？
 > * MRC 手动引用计数  * ARC 自动引用计数,现在通常使用自动引用计数
@@ -328,11 +336,6 @@ dispatch_group_async(queueGroup, aQueue, ^{
 
 42.lldb（gdb）常用的调试命令？
 > 最常用就是 : po 对象，参考[工具篇：LLDB调试器](http://southpeak.github.io/blog/2015/01/25/gong-ju-pian-:lldbdiao-shi-qi/)
-
-
-
-
-
 
 
 
