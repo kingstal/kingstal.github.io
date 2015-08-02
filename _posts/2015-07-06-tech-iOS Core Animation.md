@@ -242,7 +242,7 @@ Core Animation基于一个假设：屏幕上的任何东西都可以（或者可
 
 事务是通过CATransaction类来做管理，CATransaction没有属性或者实例方法，并且也不能用+alloc和-init方法创建它。但是可以用+begin和+commit分别来入栈或者出栈。任何可以做动画的图层属性都会被添加到栈顶的事务，你可以通过+setAnimationDuration:方法设置当前事务的动画时间，或者通过+animationDuration方法来获取值（默认0.25秒）。
 
-``` objective-c
+``` objc
 - (IBAction)changeColor
 {
     //begin a new transaction
@@ -263,7 +263,7 @@ Core Animation基于一个假设：屏幕上的任何东西都可以（或者可
 
 基于UIView的block的动画允许你在动画结束的时候提供一个完成的动作。CATranscation接口提供的`+setCompletionBlock:`方法也有同样的功能。
 
-``` objective-c
+``` objc
 //add the spin animation on completion
     [CATransaction setCompletionBlock:^{
         //rotate the layer 90 degrees
@@ -310,7 +310,7 @@ UIKit是如何禁用隐式动画的：**每个UIView对它关联的图层都扮�
 
 CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fromValue`、`id toValue` 、`id byValue`。
 
-``` objective-c
+``` objc
 	//create a basic animation
     CABasicAnimation *animation = [CABasicAnimation animation];
     animation.keyPath = @"backgroundColor";
@@ -329,7 +329,7 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 使用隐式动画的时候，可以在`CATransaction`完成块中检测到动画的完成。但是这种方式并不适用于显式动画，因为这里的动画和事务并没太多关联。为了知道一个显式动画在何时结束，需要使用一个实现了`CAAnimationDelegate`协议的`delegate`。
 
-``` objective-c
+``` objc
 - (IBAction)changeColor
 {
     //create a new random color
@@ -360,7 +360,7 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 #### 关键帧动画
 
-``` objective-c
+``` objc
 	//create a keyframe animation
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"backgroundColor";
@@ -376,7 +376,7 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 提供一个数组的值就可以按照颜色变化做动画，但一般来说用数组来描述动画**运动**并不直观。`CAKeyframeAnimation`有另一种方式去指定动画，就是使用`CGPath`。
 
-``` objective-c
+``` objc
  	//create the keyframe animation
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
     animation.keyPath = @"position";
@@ -391,10 +391,10 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 `CABasicAnimation`和`CAKeyframeAnimation`仅仅作用于单独的属性，而`CAAnimationGroup`可以把这些动画组合在一起。`CAAnimationGroup`是另一个继承于`CAAnimation`的子类，它添加了一个`animations`数组的属性，用来组合别的动画。
 
-``` objective-c
+``` objc
 	//create group animation
     CAAnimationGroup *groupAnimation = [CAAnimationGroup animation];
-    groupAnimation.animations = @[animation1, animation2]; 
+    groupAnimation.animations = @[animation1, animation2];
     groupAnimation.duration = 4.0;
     //add the animation to the color layer
     [colorLayer addAnimation:groupAnimation forKey:nil];
@@ -408,7 +408,7 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 为了创建一个过渡动画，我们将使用`CATransition`，同样是另一个`CAAnimation`的子类，和别的子类不同，CATransition有一个`type`和`subtype`来标识变换效果。`type`属性是一个`NSString`类型，可以被设置成如下类型：`kCATransitionFade` 、`kCATransitionMoveIn` 、`kCATransitionPush` 、`kCATransitionReveal`。
 
-``` objective-c
+``` objc
 //图片切换淡入淡出效果
 - (IBAction)switchImage
 {
@@ -433,7 +433,7 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 `CATransition`并不作用于指定的图层属性，这就是说你可以在即使不能准确得知改变了什么的情况下对图层做动画，例如，在不知道`UITableView`哪一行被添加或者删除的情况下，直接就可以平滑地刷新它，或者在不知道`UIViewController`内部的视图层级的情况下对两个不同的实例做过渡动画。
 
-``` objective-c
+``` objc
 //UITabBarController平滑过渡
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
@@ -451,7 +451,7 @@ CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fr
 
 对图层做截图还是很简单的。`CALayer`有一个`-renderInContext:`方法，可以通过把它绘制到Core Graphics的上下文中捕获当前内容的图片，然后在另外的视图中显示出来。如果我们把这个截屏视图置于原始视图之上，就可以遮住真实视图的所有变化，于是重新创建了一个简单的过渡效果。
 
-``` objective-c
+``` objc
 - (IBAction)performTransition
 {
     //preserve the current view snapshot
@@ -533,7 +533,7 @@ CoreAnimation有一个全局时间的概念，也就是所谓的马赫时间。�
 
 每个`CALayer`和`CAAnimation`实例都有自己本地时间的概念，是根据父图层/动画层级关系中的`beginTime`，`timeOffset`和`speed`属性计算。就和转换不同图层之间坐标关系一样，`CALayer`同样也提供了方法来转换不同图层之间的本地时间。如下：
 
-`- (CFTimeInterval)convertTime:(CFTimeInterval)t fromLayer:(CALayer *)l;` 
+`- (CFTimeInterval)convertTime:(CFTimeInterval)t fromLayer:(CALayer *)l;`
 
 `- (CFTimeInterval)convertTime:(CFTimeInterval)t toLayer:(CALayer *)l;`
 
