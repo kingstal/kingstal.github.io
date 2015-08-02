@@ -294,3 +294,274 @@ UIKit是如何禁用隐式动画的：**每个UIView对它关联的图层都扮�
 
 注意呈现图层仅仅当图层首次被提交（就是首次第一次在屏幕上显示）的时候创建，所以在那之前调用`-presentationLayer`将会返回nil。
 
+## 显示动画
+
+![CAAnimation层次结构](/assets/image/CAAnimation层次结构.png)
+
+**CALayer添加动画`- (void)addAnimation:(CAAnimation * nonnull)anim forKey:(NSString * nullable)key`**
+
+### 属性动画
+
+属性动画作用于图层的某个单一属性，并指定了它的一个目标值，或者一连串将要做动画的值。属性动画分为两种：**基础**和**关键帧**。
+
+#### 基础动画
+
+`CABasicAnimation`是`CAPropertyAnimation`的一个子类。`CAPropertyAnimation`通过指定动画的`keyPath`作用于一个单一属性，`CAAnimation`通常应用于一个指定的`CALayer`，于是这里指的也就是一个**图层的keyPath**。
+
+CABasicAnimation继承于CAPropertyAnimation，并添加了如下属性：`id fromValue`、`id toValue` 、`id byValue`。
+
+``` objective-c
+	//create a basic animation
+    CABasicAnimation *animation = [CABasicAnimation animation];
+    animation.keyPath = @"backgroundColor";
+    animation.toValue = (__bridge id)color.CGColor;
+
+	//uncomment the two lines below to solve the snap-back problem
+	//没有下面两行背景会变成以前的颜色，因为动画并没有改变图层的模型，而只是呈现层
+    animation.fromValue = (__bridge id)self.colorLayer.backgroundColor;
+    self.colorLayer.backgroundColor = color.CGColor;
+
+    //apply animation to layer
+    [self.colorLayer addAnimation:animation forKey:nil];
+```
+
+#### CAAnimationDelegate
+
+使用隐式动画的时候，可以在`CATransaction`完成块中检测到动画的完成。但是这种方式并不适用于显式动画，因为这里的动画和事务并没太多关联。为了知道一个显式动画在何时结束，需要使用一个实现了`CAAnimationDelegate`协议的`delegate`。
+
+``` objective-c
+- (IBAction)changeColor
+{
+    //create a new random color
+    CGFloat red = arc4random() / (CGFloat)INT_MAX;
+    CGFloat green = arc4random() / (CGFloat)INT_MAX;
+    CGFloat blue = arc4random() / (CGFloat)INT_MAX;
+    UIColor *color = [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+    //create a basic animation
+    CABasicAnimation *animation = [CABasicAnimation animation];
+    animation.keyPath = @"backgroundColor";
+    animation.toValue = (__bridge id)color.CGColor;
+    animation.delegate = self;
+    //apply animation to layer
+    [self.colorLayer addAnimation:animation forKey:nil];
+}
+
+//代理方法
+- (void)animationDidStop:(CABasicAnimation *)anim finished:(BOOL)flag
+{
+    //set the backgroundColor property to match animation toValue
+    // 设置一个新的事务，并且禁用图层行为。否则动画会发生两次，一个是因为显式的CABasicAnimation，另一次是因为隐式动画
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    self.colorLayer.backgroundColor = (__bridge CGColorRef)anim.toValue;
+    [CATransaction commit];
+}
+```
+
+#### 关键帧动画
+
+``` objective-c
+	//create a keyframe animation
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
+    animation.keyPath = @"backgroundColor";
+    animation.duration = 2.0;
+    animation.values = @[
+                         (__bridge id)[UIColor blueColor].CGColor,
+                         (__bridge id)[UIColor redColor].CGColor,
+                         (__bridge id)[UIColor greenColor].CGColor,
+                         (__bridge id)[UIColor blueColor].CGColor ];
+    //apply animation to layer
+    [self.colorLayer addAnimation:animation forKey:nil];
+```
+
+提供一个数组的值就可以按照颜色变化做动画，但一般来说用数组来描述动画**运动**并不直观。`CAKeyframeAnimation`有另一种方式去指定动画，就是使用`CGPath`。
+
+``` objective-c
+ 	//create the keyframe animation
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animation];
+    animation.keyPath = @"position";
+    animation.duration = 4.0;
+    animation.path = bezierPath.CGPath;
+	//图层将会根据曲线的切线自动旋转
+	animation.rotationMode = kCAAnimationRotateAuto;
+    [shipLayer addAnimation:animation forKey:nil];
+```
+
+### 动画组
+
+`CABasicAnimation`和`CAKeyframeAnimation`仅仅作用于单独的属性，而`CAAnimationGroup`可以把这些动画组合在一起。`CAAnimationGroup`是另一个继承于`CAAnimation`的子类，它添加了一个`animations`数组的属性，用来组合别的动画。
+
+``` objective-c
+	//create group animation
+    CAAnimationGroup *groupAnimation = [CAAnimationGroup animation];
+    groupAnimation.animations = @[animation1, animation2]; 
+    groupAnimation.duration = 4.0;
+    //add the animation to the color layer
+    [colorLayer addAnimation:groupAnimation forKey:nil];
+```
+
+### Transition过渡
+
+属性动画只对图层的可动画属性起作用，所以如果要改变一个不能动画的属性（比如图片），或者从层级关系中添加或者移除图层，属性动画将不起作用。
+
+于是就有了过渡的概念。过渡并不像属性动画那样平滑地在两个值之间做动画，而是影响到整个图层的变化。过渡动画首先展示之前的图层外观，然后通过一个交换过渡到新的外观。
+
+为了创建一个过渡动画，我们将使用`CATransition`，同样是另一个`CAAnimation`的子类，和别的子类不同，CATransition有一个`type`和`subtype`来标识变换效果。`type`属性是一个`NSString`类型，可以被设置成如下类型：`kCATransitionFade` 、`kCATransitionMoveIn` 、`kCATransitionPush` 、`kCATransitionReveal`。
+
+``` objective-c
+//图片切换淡入淡出效果
+- (IBAction)switchImage
+{
+    //set up crossfade transition
+    CATransition *transition = [CATransition animation];
+    transition.type = kCATransitionFade;
+    //apply transition to imageview backing layer
+    [self.imageView.layer addAnimation:transition forKey:nil];
+    //cycle to next image
+    UIImage *currentImage = self.imageView.image;
+    NSUInteger index = [self.images indexOfObject:currentImage];
+    index = (index + 1) % [self.images count];
+    self.imageView.image = self.images[index];
+}
+```
+
+#### 隐式过渡
+
+`CATransision`可以对图层任何变化平滑过渡的事实使得它成为那些不好做动画的属性图层行为的理想候选。苹果当然意识到了这点，并且当设置了`CALayer`的`content`属性的时候，**CATransition的确是默认的行为**。但是**对于视图关联的图层，或者是其他隐式动画的行为，这个特性依然是被禁用的**，但是对于你自己创建的图层，这意味着对图层contents图片做的改动都会自动附上淡入淡出的动画。
+
+#### 图层树动画
+
+`CATransition`并不作用于指定的图层属性，这就是说你可以在即使不能准确得知改变了什么的情况下对图层做动画，例如，在不知道`UITableView`哪一行被添加或者删除的情况下，直接就可以平滑地刷新它，或者在不知道`UIViewController`内部的视图层级的情况下对两个不同的实例做过渡动画。
+
+``` objective-c
+//UITabBarController平滑过渡
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
+{
+    ￼//set up crossfade transition
+    CATransition *transition = [CATransition animation];
+    transition.type = kCATransitionFade;
+    //apply transition to tab bar controller's view
+    [self.tabBarController.view.layer addAnimation:transition forKey:nil];
+}
+```
+
+### 自定义动画
+
+做过渡动画基础的原则就是**对原始的图层外观截图，然后添加一段动画，平滑过渡到图层改变之后那个截图的效果**。
+
+对图层做截图还是很简单的。`CALayer`有一个`-renderInContext:`方法，可以通过把它绘制到Core Graphics的上下文中捕获当前内容的图片，然后在另外的视图中显示出来。如果我们把这个截屏视图置于原始视图之上，就可以遮住真实视图的所有变化，于是重新创建了一个简单的过渡效果。
+
+``` objective-c
+- (IBAction)performTransition
+{
+    //preserve the current view snapshot
+    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0.0);
+    [self.view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *coverImage = UIGraphicsGetImageFromCurrentImageContext();
+    //insert snapshot view in front of this one
+    UIView *coverView = [[UIImageView alloc] initWithImage:coverImage];
+    coverView.frame = self.view.bounds;
+    [self.view addSubview:coverView];
+    //update the view (we'll simply randomize the layer background color)
+    CGFloat red = arc4random() / (CGFloat)INT_MAX;
+    CGFloat green = arc4random() / (CGFloat)INT_MAX;
+    CGFloat blue = arc4random() / (CGFloat)INT_MAX;
+    self.view.backgroundColor = [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+    //perform animation (anything you like)使用 UIView 动画更简单
+    [UIView animateWithDuration:1.0 animations:^{
+        //scale, rotate and fade the view
+        CGAffineTransform transform = CGAffineTransformMakeScale(0.01, 0.01);
+        transform = CGAffineTransformRotate(transform, M_PI_2);
+        coverView.transform = transform;
+        coverView.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        //remove the cover view now we're finished with it
+        [coverView removeFromSuperview];
+    }];
+}
+```
+
+### 在动画过程中取消动画
+
+可以用`-addAnimation:forKey:`方法中的`key`参数来在添加动画之后检索一个动画，使用如下方法：`- (CAAnimation *)animationForKey:(NSString *)key;`。但并不支持在动画运行过程中修改动画，所以这个方法主要用来检测动画的属性，或者判断它是否被添加到当前图层中。
+
+为了终止一个指定的动画，你可以用如下方法把它从图层移除掉：`-(void)removeAnimationForKey:(NSString *)key;`或者移除所有动画：`- (void)removeAllAnimations;`。
+
+## 图层时间
+
+### CAMediaTiming协议
+
+`CAMediaTiming`协议定义了在一段动画内用来控制逝去时间的属性的集合，`CALayer`和`CAAnimation`都实现了这个协议，所以时间可以被任意基于一个图层或者一段动画的类控制。
+
+#### 持续和重复
+
+`duration`是一个`CFTimeInterval`的类型（类似于NSTimeInterval的一种双精度浮点类型），对将要进行的动画的一次迭代指定了时间。
+
+`repeatCount`，代表动画重复的迭代次数。
+
+`duration`和`repeatCount`默认都是0。但这不意味着动画时长为0秒，或者0次，这里的0仅仅代表了“默认”，也就是0.25秒和1次。
+
+#### 相对时间
+
+每次讨论到Core Animation，时间都是相对的，每个动画都有它自己描述的时间，可以独立地加速，延时或者偏移。
+
+`beginTime`指定了动画开始之前的的延迟时间。这里的延迟从动画添加到可见图层的那一刻开始测量，默认是0（就是说动画会立刻执行）。
+
+`speed`是一个时间的倍数，默认1.0，减少它会减慢图层/动画的时间，增加它会加快速度。如果2.0的速度，那么对于一个`duration`为t的动画，实际上在0.5t秒的时候就已经完成了。
+
+`timeOffset`和beginTime类似，增加`timeOffset`只是让动画快进到某一点，例如，对于一个持续t秒的动画来说，设置`timeOffset`为0.5意味着动画将从一半的地方开始。
+
+和beginTime不同的是，timeOffset并不受speed的影响。所以如果你把`speed`设为2.0，把`timeOffset`设置为0.5，那么你的动画将从动画最后结束的地方开始，因为t秒的动画实际上被缩短到了0.5t秒。然而即使使用了`timeOffset`让动画从结束的地方开始，它仍然播放了一个完整的时长，这个动画仅仅是循环了一圈，然后从头开始播放。
+
+#### `fillMode`
+
+对于`beginTime`非0的一段动画来说，会出现一个当动画添加到图层上但什么也没发生的状态。类似的，`removeOnCompletion`被设置为NO的动画将会在动画结束的时候仍然保持之前的状态。这就产生了一个问题，当动画开始之前和动画结束之后，被设置动画的属性将会是什么值呢？
+
+这种行为就交给开发者了，它可以被CAMediaTiming的fillMode来控制。fillMode是一个NSString类型，可以接受如下四种常量：`kCAFillModeForwards`、`kCAFillModeBackwards`、`kCAFillModeBoth`、`kCAFillModeRemoved`。
+
+默认是`kCAFillModeRemoved`，当动画不再播放的时候就显示图层模型指定的值。剩下的三种类型向前，向后或者即向前又向后去填充动画状态，使得动画在开始前或者结束后仍然保持开始和结束那一刻的值。
+
+### 层级关系时间
+
+每个图层是如何相对在图层树中的父图层定义它的坐标系的。动画时间和它类似，每个动画和图层在时间上都有它自己的层级概念，相对于它的父亲来测量。对图层调整时间将会影响到它本身和子图层的动画，但不会影响到父图层。
+
+对`CALayer`或者`CAGroupAnimation`调整`duration`和`repeatCount`/`repeatDuration`属性并不会影响到子动画。但是**`beginTime`，`timeOffset`和`speed`属性将会影响到子动画**。然而在层级关系中，`beginTime`指定了父图层开始动画（或者组合关系中的父动画）和对象将要开始自己动画之间的偏移。类似的，调整`CALayer`和`CAGroupAnimation`的`speed`属性将会对动画以及子动画速度应用一个缩放的因子。
+
+#### 全局时间和本地时间
+
+CoreAnimation有一个全局时间的概念，也就是所谓的马赫时间。马赫时间在设备上所有进程都是全局的--但是在不同设备上并不是全局的。可以使用`CACurrentMediaTime`函数来访问马赫时间：`CFTimeInterval time = CACurrentMediaTime();`，它返回了设备自从上次启动后的秒数，它真实的作用在于对动画的时间测量提供了一个相对值。注意**当设备休眠的时候马赫时间会暂停，也就是所有的CAAnimations（基于马赫时间）同样也会暂停**。
+
+每个`CALayer`和`CAAnimation`实例都有自己本地时间的概念，是根据父图层/动画层级关系中的`beginTime`，`timeOffset`和`speed`属性计算。就和转换不同图层之间坐标关系一样，`CALayer`同样也提供了方法来转换不同图层之间的本地时间。如下：
+
+`- (CFTimeInterval)convertTime:(CFTimeInterval)t fromLayer:(CALayer *)l;` 
+
+`- (CFTimeInterval)convertTime:(CFTimeInterval)t toLayer:(CALayer *)l;`
+
+当用来同步不同图层之间有不同的`speed`，`timeOffset`和`beginTime`的动画，这些方法会很有用。
+
+#### 暂停，倒回和快进
+
+设置动画的`speed`属性为0可以暂停动画，但在动画被添加到图层之后不太可能再修改它了，所以不能对正在进行的动画使用这个属性。
+
+如果把图层的`speed`设置成0，它会暂停任何添加到图层上的动画。类似的，设置`speed`大于1.0将会快进，设置成一个负值将会倒回动画。
+
+一个简单的方法是可以利用`CAMediaTiming`来**暂停图层本身**。通过增加主窗口图层的`speed`，可以暂停整个应用程序的动画。这对UI自动化提供了好处，我们可以加速所有的视图动画来进行自动化测试（注意对于在主窗口之外的视图并不会被影响，比如UIAlertview）。可以在app delegate设置如下进行验证：`self.window.layer.speed = 100;`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
