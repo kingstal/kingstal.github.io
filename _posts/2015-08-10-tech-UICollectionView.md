@@ -1,3 +1,13 @@
+---
+layout: post
+title: UICollectionView
+category: 技术
+tags: UICollectionView
+keywords: UICollectionView
+description:
+---
+
+
 ### 解析`UICollectionViewController`
 
 ![UICollectionViewController](/assets/image/iOS-UICollectionViewController.png)
@@ -77,10 +87,10 @@
 继承`UICollectionViewLayout`，然后重载下列方法：
 
 ``` objc
--(CGSize)collectionViewContentSize 
+-(CGSize)collectionViewContentSize
 // 返回collectionView的内容的尺寸
 
--(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect 
+-(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 //返回rect中的所有的元素的布局属性,返回的是包含UICollectionViewLayoutAttributes的NSArray
 //UICollectionViewLayoutAttributes可以是cell，追加视图或装饰视图的信息，通过不同的UICollectionViewLayoutAttributes初始化方法可以得到不同类型UICollectionViewLayoutAttributes：
 //layoutAttributesForCellWithIndexPath:
@@ -161,7 +171,7 @@ define ITEM_SIZE 70
         //这里利用了-layoutAttributesForItemAtIndexPath:来获取attributes
         NSIndexPath* indexPath = [NSIndexPath indexPathForItem:i inSection:0];
         [attributes addObject:[self layoutAttributesForItemAtIndexPath:indexPath]];
-    }    
+    }
     return attributes;
 }
 ```
@@ -185,10 +195,10 @@ define ITEM_SIZE 70
 {
     // Keep track of insert and delete index paths
     [super prepareForCollectionViewUpdates:updateItems];
-    
+
     self.deleteIndexPaths = [NSMutableArray array];
     self.insertIndexPaths = [NSMutableArray array];
-    
+
     for (UICollectionViewUpdateItem *update in updateItems)
     {
         if (update.updateAction == UICollectionUpdateActionDelete)
@@ -216,18 +226,18 @@ define ITEM_SIZE 70
 {
     // Must call super
     UICollectionViewLayoutAttributes *attributes = [super initialLayoutAttributesForAppearingItemAtIndexPath:itemIndexPath];
-    
+
     if ([self.insertIndexPaths containsObject:itemIndexPath])
     {
         // only change attributes on inserted cells
         if (!attributes)
             attributes = [self layoutAttributesForItemAtIndexPath:itemIndexPath];
-        
+
         // Configure attributes ...
         attributes.alpha = 0.0;
         attributes.center = CGPointMake(_center.x, _center.y);
     }
-    
+
     return attributes;
 }
 
@@ -238,19 +248,19 @@ define ITEM_SIZE 70
     // So far, calling super hasn't been strictly necessary here, but leaving it in
     // for good measure
     UICollectionViewLayoutAttributes *attributes = [super finalLayoutAttributesForDisappearingItemAtIndexPath:itemIndexPath];
-    
+
     if ([self.deleteIndexPaths containsObject:itemIndexPath])
     {
         // only change attributes on deleted cells
        if (!attributes)
             attributes = [self layoutAttributesForItemAtIndexPath:itemIndexPath];
-        
+
         // Configure attributes ...
         attributes.alpha = 0.0;
         attributes.center = CGPointMake(_center.x, _center.y);
         attributes.transform3D = CATransform3DMakeScale(0.1, 0.1, 1.0);
     }
-    
+
     return attributes;
 }
 ```
