@@ -68,6 +68,7 @@ description:
 ![Method Swizzling](/assets/image/iOS-Runtime-Method Swizzling.png)
 
 **说明**：
+
 1. 第3步中如果 originalMethod 已经存在，则添加失败。
 
 2. 失败则直接交换 originalMethod 和 swizzledMethod；若成功，则说明该类本身没有实现 originalMethod，第2步中`Method originalMethod = class_getInstanceMethod(class, originalSelector);`获取都是父类的 originalMethod，这时候 originalSelector 已指向 swizzledMethod，我们需要的就是将 swizzledSelector 指向父类的 originalMethod。
